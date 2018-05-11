@@ -1,0 +1,31 @@
+AbstractCanalInstance  canal实例中的start方法启动，其中canlEventParser就是从这里启动
+
+
+
+AbstaractEventParser 的start启动步骤：
+1、修改启动状态
+2、初始化BinlogParser
+        3、设置转换过滤
+4、转换解析器状态
+5、创建执行线程
+6、设置线程异常处理器
+7、启动线程
+
+
+parseAndProfilingIfNecessary  解析入口
+
+
+部署环境：
+172.21.65.30 3336   wdako  @539b34c448e010fd4dfe7f93d134ab77  WDako0509!  库名 ako
+
+172.20.1.3 3306   bgbinlog  @70e8078f60ccc5392a2851e1f1b56277  BGbinlog0620!
+
+
+parseThread 线程位于 AbstractEventParser 145行
+
+
+
+该线程的作用是dum数据并且内嵌了sinkFunction
+
+sinkFunction 定义在该线程内部；该类的主要作用就是讲解析后的数据存放到EventTransactionBuffer
+

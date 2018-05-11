@@ -26,6 +26,12 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import com.alibaba.otter.node.etl.load.loader.AbstractLoadContext;
+import com.alibaba.otter.node.etl.load.loader.mq.MqLoadAction;
+import com.alibaba.otter.node.etl.load.loader.mq.context.MqLoadContext;
+import com.alibaba.otter.shared.common.model.config.channel.Channel;
+import com.alibaba.otter.shared.common.model.config.data.mq.MqDataMedia;
+import com.alibaba.otter.shared.common.model.config.pipeline.Pipeline;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -186,16 +192,37 @@ public class DataBatchLoader implements OtterLoader<DbBatch, List<LoadContext>>,
                                 final List<RowBatch> rowBatchs, final WeightController controller) {
         for (final RowBatch rowBatch : rowBatchs) {
             // 提交多个并行加载通道
-            futures.add(completionService.submit(new Callable<DbLoadContext>() {
+            futures.add(completionService.submit(new Callable<AbstractLoadContext>() {
 
-                public DbLoadContext call() throws Exception {
+                public AbstractLoadContext call() throws Exception {
                     try {
                         MDC.put(OtterConstants.splitPipelineLogFileKey,
                                 String.valueOf(rowBatch.getIdentity().getPipelineId()));
-                        // dbLoadAction是一个pool池化对象
-                        DbLoadAction dbLoadAction = (DbLoadAction) beanFactory.getBean("dbLoadAction",
-                                                                                       DbLoadAction.class);
-                        return dbLoadAction.load(rowBatch, controller);
+
+                        //过滤Mq
+                        Identity identity = rowBatch.getIdentity();
+                        MqLoadContext context = new MqLoadContext();
+                        context.setIdentity(identity);
+                        Channel channel = configClientService.findChannel(identity.getChannelId());
+                        Pipeline pipeline = configClientService.findPipeline(identity.getPipelineId());
+                        context.setChannel(channel);
+                        context.setPipeline(pipeline);
+                        DataMedia dataMedia = ConfigHelper.findDataMedia(context.getPipeline(), rowBatch.getDatas().get(0).getTableId());
+                        //过滤Mq
+                        if(dataMedia instanceof MqDataMedia){
+                            MqLoadAction mqLoadAction = beanFactory.getBean("mqLoadAction",
+                                    MqLoadAction.class);
+                            return mqLoadAction.load(rowBatch,controller);
+                        }else{
+                            // dbLoadAction是一个pool池化对象
+                            DbLoadAction dbLoadAction = beanFactory.getBean("dbLoadAction",
+                                    DbLoadAction.class);
+                            return dbLoadAction.load(rowBatch, controller);
+
+                        }
+
+
+
                     } finally {
                         MDC.remove(OtterConstants.splitPipelineLogFileKey);
                     }

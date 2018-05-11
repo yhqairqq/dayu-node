@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import com.alibaba.otter.node.etl.load.loader.AbstractLoadContext;
 import org.apache.commons.lang.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,7 @@ import com.alibaba.otter.shared.etl.model.EventData;
  * @author jianghang 2011-11-10 上午11:31:05
  * @version 4.0.0
  */
-public class LogLoadInterceptor extends AbstractLoadInterceptor<DbLoadContext, EventData> {
+public class LogLoadInterceptor extends AbstractLoadInterceptor<AbstractLoadContext, EventData> {
 
     private static final Logger logger           = LoggerFactory.getLogger(LogLoadInterceptor.class);
     private static final String SEP              = SystemUtils.LINE_SEPARATOR;
@@ -53,7 +54,7 @@ public class LogLoadInterceptor extends AbstractLoadInterceptor<DbLoadContext, E
         context_format += "* total Data : [{3}] , success Data : [{4}] , failed Data : [{5}] , Interrupt : [{6}]" + SEP;
     }
 
-    public void commit(DbLoadContext context) {
+    public void commit(AbstractLoadContext context) {
         // 成功时记录一下
         boolean dumpThisEvent = context.getPipeline().getParameters().isDumpEvent()
                                 || context.getPipeline().getParameters().isDryRun();
@@ -117,7 +118,7 @@ public class LogLoadInterceptor extends AbstractLoadInterceptor<DbLoadContext, E
         } while (index < size);
     }
 
-    private String dumpContextInfo(String status, DbLoadContext context) {
+    private String dumpContextInfo(String status, AbstractLoadContext context) {
         int successed = context.getProcessedDatas().size();
         int failed = context.getFailedDatas().size();
         int all = context.getPrepareDatas().size();

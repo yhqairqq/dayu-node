@@ -26,6 +26,7 @@ import com.alibaba.otter.shared.common.model.config.ConfigHelper;
 import com.alibaba.otter.shared.common.model.config.data.DataMedia;
 import com.alibaba.otter.shared.common.model.config.data.DataMediaPair;
 import com.alibaba.otter.shared.common.model.config.data.db.DbDataMedia;
+import com.alibaba.otter.shared.common.model.config.data.mq.MqDataMedia;
 import com.alibaba.otter.shared.common.model.config.pipeline.Pipeline;
 import com.alibaba.otter.shared.etl.model.BatchObject;
 import com.alibaba.otter.shared.etl.model.EventData;
@@ -163,6 +164,8 @@ public class OtterTransformerFactory {
     // 查找对应的tranlate转化对象
     private OtterTransformer lookup(DataMedia sourceDataMedia, DataMedia targetDataMedia) {
         if (sourceDataMedia instanceof DbDataMedia && targetDataMedia instanceof DbDataMedia) {
+            return rowDataTransformer;
+        }else if(sourceDataMedia instanceof  DbDataMedia && targetDataMedia instanceof MqDataMedia){
             return rowDataTransformer;
         }
 

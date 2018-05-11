@@ -52,6 +52,7 @@
 	</scm>
 
 	<repositories>
+
 		<repository>
 			<id>central</id>
 			<url>http://repo1.maven.org/maven2</url>
@@ -105,6 +106,16 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
+		<repository>
+			<id>weidai-releases</id>
+			<name>Releases</name>
+			<url>http://192.168.17.252:8081/nexus/content/repositories/releases/</url>
+		</repository>
+		<repository>
+			<id>weidai-snapshots</id>
+			<name>Snapshots</name>
+			<url>http://192.168.17.252:8081/nexus/content/repositories/snapshots/</url>
+		</repository>
 	</repositories>
 
 	<properties>
@@ -112,8 +123,8 @@
         <maven.test.skip>true</maven.test.skip>
         <downloadSources>true</downloadSources>
         <!-- compiler settings properties -->
-        <java_source_version>1.6</java_source_version>
-        <java_target_version>1.6</java_target_version>
+        <java_source_version>1.8</java_source_version>
+        <java_target_version>1.8</java_target_version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<file_encoding>UTF-8</file_encoding>
 		<spring-version>3.1.2.RELEASE</spring-version>
@@ -229,6 +240,12 @@
 				<groupId>mysql</groupId>
 				<artifactId>mysql-connector-java</artifactId>
 				<version>5.1.40</version>
+			</dependency>
+			<!-- pg-->
+			<dependency>
+				<groupId>org.postgresql</groupId>
+				<artifactId>postgresql</artifactId>
+				<version>42.2.2</version>
 			</dependency>
             <!-- oracle -->
 			<dependency>

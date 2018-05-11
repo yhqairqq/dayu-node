@@ -23,5 +23,14 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.kafka</groupId>
+			<artifactId>kafka_2.10</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba.otter</groupId>
+			<artifactId>canal.parse.dbsync</artifactId>
+			<version>1.0.26-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>

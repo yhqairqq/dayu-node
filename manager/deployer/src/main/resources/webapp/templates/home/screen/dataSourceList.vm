@@ -75,6 +75,7 @@ $control.setTemplate("home:navigation.vm")
   <!--常规按钮-->
       #if($user.authorizeType.isAdmin())
 		<div class="btn"><a href="addDataSource.htm">添加</a></div>
+          <div class="btn"><a href="addMqSource.htm">添加Mq</a></div>
 	  #end
   
      

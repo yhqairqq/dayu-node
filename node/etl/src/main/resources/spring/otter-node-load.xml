@@ -21,6 +21,23 @@
    		<property name="proxyTargetClass" value="true" />
 		<property name="targetSource" ref="dbLoadActionTargetSource" />
 	</bean>
+
+	<bean id="mqLoadAction" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="optimize" value="false"/>
+		<property name="proxyTargetClass" value="true" />
+		<property name="targetSource" ref="mqLoadActionTargetSource" />
+	</bean>
+
+
+	<bean id="mqLoadActionTargetSource" class="org.springframework.aop.target.CommonsPoolTargetSource" >
+		<property name="minIdle" value="1" />
+		<property name="maxSize" value="-1" />
+		<property name="timeBetweenEvictionRunsMillis" value="60000" /><!-- 1分钟进行一次回收 -->
+		<property name="minEvictableIdleTimeMillis" value="600000" /><!-- 10分钟回收空闲的 -->
+		<property name="targetBeanName" value="mqLoadActionTarget" />
+	</bean>
+
+
 	<bean id="dbLoadActionTargetSource" class="org.springframework.aop.target.CommonsPoolTargetSource" >
 		<property name="minIdle" value="1" />
 		<property name="maxSize" value="-1" />
@@ -29,6 +46,13 @@
 		<property name="targetBeanName" value="dbLoadActionTarget" />
 	</bean>
 	<bean id="dbLoadActionTarget" class="com.alibaba.otter.node.etl.load.loader.db.DbLoadAction" scope="prototype">
+		<property name="retry" value="3" />
+		<property name="retryWait" value="3000" />
+		<property name="poolSize" value="5" />
+		<property name="interceptor" ref="dbLoadInterceptor" />
+	</bean>
+
+	<bean id="mqLoadActionTarget" class="com.alibaba.otter.node.etl.load.loader.mq.MqLoadAction" scope="prototype">
 		<property name="retry" value="3" />
 		<property name="retryWait" value="3000" />
 		<property name="poolSize" value="5" />

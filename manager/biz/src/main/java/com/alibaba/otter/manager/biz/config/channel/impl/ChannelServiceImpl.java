@@ -382,6 +382,9 @@ public class ChannelServiceImpl implements ChannelService {
                 try {
                     final ChannelDO channelDo = channelDao.findById(channelId);
 
+
+
+
                     if (null == channelDo) {
                         String exceptionCause = "query channelId:" + channelId + " return null.";
                         logger.error("ERROR ## " + exceptionCause);

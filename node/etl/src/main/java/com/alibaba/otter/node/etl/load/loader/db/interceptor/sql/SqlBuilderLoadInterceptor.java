@@ -18,6 +18,9 @@ package com.alibaba.otter.node.etl.load.loader.db.interceptor.sql;
 
 import java.util.List;
 
+import com.alibaba.otter.node.common.config.ConfigClientService;
+import com.alibaba.otter.node.etl.load.loader.AbstractLoadContext;
+import com.alibaba.otter.node.etl.load.loader.mq.context.MqLoadContext;
 import org.springframework.util.CollectionUtils;
 
 import com.alibaba.otter.node.etl.common.db.dialect.DbDialect;
@@ -37,89 +40,99 @@ import com.alibaba.otter.shared.etl.model.EventType;
  * @author jianghang 2011-12-26 下午12:09:20
  * @version 4.0.0
  */
-public class SqlBuilderLoadInterceptor extends AbstractLoadInterceptor<DbLoadContext, EventData> {
+public class SqlBuilderLoadInterceptor extends AbstractLoadInterceptor<AbstractLoadContext, EventData> {
 
     private DbDialectFactory dbDialectFactory;
 
-    public boolean before(DbLoadContext context, EventData currentData) {
-        // 初步构建sql
-        DbDialect dbDialect = dbDialectFactory.getDbDialect(context.getIdentity().getPipelineId(),
-            (DbMediaSource) context.getDataMediaSource());
-        SqlTemplate sqlTemplate = dbDialect.getSqlTemplate();
-        EventType type = currentData.getEventType();
-        String sql = null;
+    private ConfigClientService configClientService;
 
-        String schemaName = (currentData.isWithoutSchema() ? null : currentData.getSchemaName());
-        // 注意insert/update语句对应的字段数序都是将主键排在后面
-        if (type.isInsert()) {
-            if (CollectionUtils.isEmpty(currentData.getColumns())
-                && (dbDialect.isDRDS() || sqlTemplate instanceof OracleSqlTemplate)) { // 如果表为全主键，直接进行insert
-                // sql
-                sql = sqlTemplate.getInsertSql(schemaName,
-                    currentData.getTableName(),
-                    buildColumnNames(currentData.getKeys()),
-                    buildColumnNames(currentData.getColumns()));
-            } else {
-                sql = sqlTemplate.getMergeSql(schemaName,
-                    currentData.getTableName(),
-                    buildColumnNames(currentData.getKeys()),
-                    buildColumnNames(currentData.getColumns()),
-                    new String[] {},
-                    !dbDialect.isDRDS());
-            }
-        } else if (type.isUpdate()) {
-            // String[] keyColumns = buildColumnNames(currentData.getKeys());
-            // String[] otherColumns =
-            // buildColumnNames(currentData.getUpdatedColumns());
-            // boolean existOldKeys = false;
-            // for (String key : keyColumns) {
-            // // 找一下otherColumns是否有主键，存在就代表有主键变更
-            // if (ArrayUtils.contains(otherColumns, key)) {
-            // existOldKeys = true;
-            // break;
-            // }
-            // }
+    public boolean before(AbstractLoadContext context, EventData currentData) {
 
-            boolean existOldKeys = !CollectionUtils.isEmpty(currentData.getOldKeys());
-            boolean rowMode = context.getPipeline().getParameters().getSyncMode().isRow();
-            String[] keyColumns = null;
-            String[] otherColumns = null;
-            if (existOldKeys) {
-                // 需要考虑主键变更的场景
-                // 构造sql如下：update table xxx set pk = newPK where pk = oldPk
-                keyColumns = buildColumnNames(currentData.getOldKeys());
-                // 这里需要精确获取变更的主键,因为目标为DRDS时主键会包含拆分键,正常的原主键变更只更新对应的单主键列即可
-                if (dbDialect.isDRDS()) {
-                    otherColumns = buildColumnNames(currentData.getUpdatedColumns(), currentData.getUpdatedKeys());
+        if(context instanceof MqLoadContext){
+            MqLoadContext mqLoadContext = (MqLoadContext)context;
+            //待完善
+        }else if(context instanceof DbLoadContext){
+
+          DbLoadContext  dbLoadContext =  (DbLoadContext)context;
+            // 初步构建sql
+            DbDialect dbDialect = dbDialectFactory.getDbDialect(context.getIdentity().getPipelineId(),
+                    (DbMediaSource) dbLoadContext.getDataMediaSource());
+            SqlTemplate sqlTemplate = dbDialect.getSqlTemplate();
+            EventType type = currentData.getEventType();
+            String sql = null;
+
+            String schemaName = (currentData.isWithoutSchema() ? null : currentData.getSchemaName());
+            // 注意insert/update语句对应的字段数序都是将主键排在后面
+            if (type.isInsert()) {
+                if (CollectionUtils.isEmpty(currentData.getColumns())
+                        && (dbDialect.isDRDS() || sqlTemplate instanceof OracleSqlTemplate)) { // 如果表为全主键，直接进行insert
+                    // sql
+                    sql = sqlTemplate.getInsertSql(schemaName,
+                            currentData.getTableName(),
+                            buildColumnNames(currentData.getKeys()),
+                            buildColumnNames(currentData.getColumns()));
                 } else {
-                    otherColumns = buildColumnNames(currentData.getUpdatedColumns(), currentData.getKeys());
+                    sql = sqlTemplate.getMergeSql(schemaName,
+                            currentData.getTableName(),
+                            buildColumnNames(currentData.getKeys()),
+                            buildColumnNames(currentData.getColumns()),
+                            new String[] {},
+                            !dbDialect.isDRDS());
                 }
+            } else if (type.isUpdate()) {
+                // String[] keyColumns = buildColumnNames(currentData.getKeys());
+                // String[] otherColumns =
+                // buildColumnNames(currentData.getUpdatedColumns());
+                // boolean existOldKeys = false;
+                // for (String key : keyColumns) {
+                // // 找一下otherColumns是否有主键，存在就代表有主键变更
+                // if (ArrayUtils.contains(otherColumns, key)) {
+                // existOldKeys = true;
+                // break;
+                // }
+                // }
+
+                boolean existOldKeys = !CollectionUtils.isEmpty(currentData.getOldKeys());
+                boolean rowMode = context.getPipeline().getParameters().getSyncMode().isRow();
+                String[] keyColumns = null;
+                String[] otherColumns = null;
+                if (existOldKeys) {
+                    // 需要考虑主键变更的场景
+                    // 构造sql如下：update table xxx set pk = newPK where pk = oldPk
+                    keyColumns = buildColumnNames(currentData.getOldKeys());
+                    // 这里需要精确获取变更的主键,因为目标为DRDS时主键会包含拆分键,正常的原主键变更只更新对应的单主键列即可
+                    if (dbDialect.isDRDS()) {
+                        otherColumns = buildColumnNames(currentData.getUpdatedColumns(), currentData.getUpdatedKeys());
+                    } else {
+                        otherColumns = buildColumnNames(currentData.getUpdatedColumns(), currentData.getKeys());
+                    }
+                } else {
+                    keyColumns = buildColumnNames(currentData.getKeys());
+                    otherColumns = buildColumnNames(currentData.getUpdatedColumns());
+                }
+
+                if (rowMode && !existOldKeys) {// 如果是行记录,并且不存在主键变更，考虑merge sql
+                    sql = sqlTemplate.getMergeSql(schemaName,
+                            currentData.getTableName(),
+                            keyColumns,
+                            otherColumns,
+                            new String[] {},
+                            !dbDialect.isDRDS());
+                } else {// 否则进行update sql
+                    sql = sqlTemplate.getUpdateSql(schemaName, currentData.getTableName(), keyColumns, otherColumns);
+                }
+            } else if (type.isDelete()) {
+                sql = sqlTemplate.getDeleteSql(schemaName,
+                        currentData.getTableName(),
+                        buildColumnNames(currentData.getKeys()));
+            }
+
+            // 处理下hint sql
+            if (currentData.getHint() != null) {
+                currentData.setSql(currentData.getHint() + sql);
             } else {
-                keyColumns = buildColumnNames(currentData.getKeys());
-                otherColumns = buildColumnNames(currentData.getUpdatedColumns());
+                currentData.setSql(sql);
             }
-
-            if (rowMode && !existOldKeys) {// 如果是行记录,并且不存在主键变更，考虑merge sql
-                sql = sqlTemplate.getMergeSql(schemaName,
-                    currentData.getTableName(),
-                    keyColumns,
-                    otherColumns,
-                    new String[] {},
-                    !dbDialect.isDRDS());
-            } else {// 否则进行update sql
-                sql = sqlTemplate.getUpdateSql(schemaName, currentData.getTableName(), keyColumns, otherColumns);
-            }
-        } else if (type.isDelete()) {
-            sql = sqlTemplate.getDeleteSql(schemaName,
-                currentData.getTableName(),
-                buildColumnNames(currentData.getKeys()));
-        }
-
-        // 处理下hint sql
-        if (currentData.getHint() != null) {
-            currentData.setSql(currentData.getHint() + sql);
-        } else {
-            currentData.setSql(sql);
         }
         return false;
     }
@@ -154,4 +167,11 @@ public class SqlBuilderLoadInterceptor extends AbstractLoadInterceptor<DbLoadCon
         this.dbDialectFactory = dbDialectFactory;
     }
 
+    public ConfigClientService getConfigClientService() {
+        return configClientService;
+    }
+
+    public void setConfigClientService(ConfigClientService configClientService) {
+        this.configClientService = configClientService;
+    }
 }

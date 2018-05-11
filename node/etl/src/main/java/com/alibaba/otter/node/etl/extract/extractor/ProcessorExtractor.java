@@ -108,9 +108,7 @@ public class ProcessorExtractor extends AbstractExtractor<DbBatch> {
                             break;
                         }
                     }
-
                 }
-
             }
 
             // 等待所有都处理完成

@@ -26,6 +26,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import com.alibaba.otter.shared.common.model.config.data.DataMedia;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ddlutils.model.Table;
 import org.slf4j.Logger;
@@ -141,6 +142,9 @@ public class DataSourceChecker {
             } else if (sourceType.equalsIgnoreCase("ORACLE")) {
                 dbMediaSource.setType(DataMediaType.ORACLE);
                 dbMediaSource.setDriver("oracle.jdbc.driver.OracleDriver");
+            }else if(sourceType.equalsIgnoreCase("PG")){
+                dbMediaSource.setType(DataMediaType.PG);
+                dbMediaSource.setDriver("org.postgresql.Driver");
             }
 
             dataSource = dataSourceCreator.createDataSource(dbMediaSource);
@@ -162,9 +166,11 @@ public class DataSourceChecker {
                 // sql
                 // ="select * from V$NLS_PARAMETERS where parameter in('NLS_LANGUAGE','NLS_TERRITORY','NLS_CHARACTERSET')";
                 sql = "select * from V$NLS_PARAMETERS where parameter in('NLS_CHARACTERSET')";
+            }else if(sourceType.equalsIgnoreCase("PG")){
+                sql="select name,setting from pg_settings  where name like '%encoding%'";
             }
             rs = stmt.executeQuery(sql);
-            while (rs.next()) {
+                while (rs.next()) {
                 String defaultEncode = null;
                 if (sourceType.equals("MYSQL")) {
                     defaultEncode = ((String) rs.getObject(2)).toLowerCase();
@@ -178,6 +184,11 @@ public class DataSourceChecker {
                     defaultEncode = defaultEncode.equalsIgnoreCase("zhs16gbk") ? "gbk" : defaultEncode;
                     defaultEncode = defaultEncode.equalsIgnoreCase("us7ascii") ? "iso-8859-1" : defaultEncode;
                     if (!encode.toLowerCase().equals(defaultEncode)) {
+                        return ENCODE_FAIL + defaultEncode;
+                    }
+                }else if(sourceType.equals("PG")){
+                    defaultEncode = ((String) rs.getObject(2)).toLowerCase();
+                    if(!encode.equalsIgnoreCase(defaultEncode)){
                         return ENCODE_FAIL + defaultEncode;
                     }
                 }

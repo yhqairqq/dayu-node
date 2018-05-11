@@ -93,7 +93,7 @@ public class ZooKeeperClient {
     /**
      * 从当前的node信息中获取对应的zk集群信息
      */
-    private static List<String> getServerAddrs() {
+    public static List<String> getServerAddrs() {
         List<String> result = ArbitrateConfigUtils.getServerAddrs();
         if (result == null || result.size() == 0) {
             result = Arrays.asList(cluster);

@@ -81,7 +81,6 @@ public class ArbitrateConfigImpl implements ArbitrateConfig, InitializingBean {
                 return pipeline;
             }
         }
-
         return null;
     }
 

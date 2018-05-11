@@ -35,7 +35,11 @@ public enum DataMediaType {
     /** napoli */
     NAPOLI,
     /** diamond push for us */
-    DIAMOND_PUSH;
+    DIAMOND_PUSH,
+    /** pgxl **/
+    PG;
+
+    public boolean isPg(){ return this == DataMediaType.PG;}
 
     public boolean isMysql() {
         return this == DataMediaType.MYSQL;

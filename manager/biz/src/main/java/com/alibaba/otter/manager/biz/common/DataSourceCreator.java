@@ -184,7 +184,11 @@ public class DataSourceCreator implements DisposableBean {
                 }
             }
             // dbcpDs.setValidationQuery("select 1");
-        } else {
+        }else if(dataMediaType.isPg()){
+
+
+        }
+        else {
             logger.error("ERROR ## Unknow database type");
         }
 
