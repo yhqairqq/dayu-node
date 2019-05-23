@@ -1,3 +1,7 @@
+
+
+
+
 AbstractCanalInstance  canal实例中的start方法启动，其中canlEventParser就是从这里启动
 
 
@@ -19,7 +23,10 @@ parseAndProfilingIfNecessary  解析入口
 172.21.65.30 3336   wdako  @539b34c448e010fd4dfe7f93d134ab77  WDako0509!  库名 ako
 
 172.20.1.3 3306   bgbinlog  @70e8078f60ccc5392a2851e1f1b56277  BGbinlog0620!
+172.20.1.3:3306;
 
+
+172.21.65.11:3346  bgbinlog BGbinlog0620! uceter
 
 parseThread 线程位于 AbstractEventParser 145行
 
@@ -29,3 +36,138 @@ parseThread 线程位于 AbstractEventParser 145行
 
 sinkFunction 定义在该线程内部；该类的主要作用就是讲解析后的数据存放到EventTransactionBuffer
 
+
+kafka 建立topic事项
+1.建立名称用驼峰法建立名称，不要有下划线和点
+2.partition建立4的倍数，数量多少根据业务量
+3.replication-factor 最佳数为3
+4.消费线程数要小于或者等于partition建立数
+5.建立topic用终端建立，不要用kafka-manager建立，可能会出现版本冲突未知问题kafka-manager使用的是0.9版本
+例子
+6.如果要重新规划partition数量，不要手动修改，会影响整体集群，等消费完后，可删除重新建立相同名称的topic
+7.message.max.bytes (默认:1000000) – broker能接收消息的最大字节数，这个值应该比消费端的fetch.message.max.bytes更小才对，否则broker就会因为消费端无法使用这个消息而挂起。
+
+kafka命令（终端操作）
+删除
+./kafka-topics.sh --delete --zookeeper db1:2181,db2:2181,db3:2181 --topic commonBbidtenderdetail
+
+建立
+./kafka-topics.sh -zookeeper db1:2181,db2:2181,db3:2181 -topic commonBbidtenderdetail -replication-factor 3 -partitions 8 --config max.message.bytes=8388608 -create
+
+
+canal_wdw_a_flow_info_1
+
+172.20.1.3:3306  bg_yhq  BG_yhq123!
+
+
+数据协议：
+{
+    "columns": {
+        "fid": "012018050915555676736261146",
+        "account_type": "01",
+        "flowclassify": "01",
+        "utype": "02",
+        "sub_code": "",
+        "memo": "会员[1111383920][姓名：搜索[wd1111383920]]充值申请：59749.00",
+        "isspecial": "02",
+        "uid": "1111383920",
+        "balance": "59749.0",
+        "obj_account_type": "07",
+        "business_type": "102",
+        "id": "9",
+        "operate_time": "2018-05-09 15:55:57",
+        "amount": "59749.0",
+        "orderid": "072018050915555674460551230",
+        "trade_sub_code": "10010",
+        "objcid": "-3",
+        "operatorid": "0"
+    },
+    "columnsType": {
+        "fid": "VARCHAR",
+        "account_type": "CHAR",
+        "flowclassify": "CHAR",
+        "pay_code": "CHAR",
+        "utype": "VARCHAR",
+        "sub_code": "VARCHAR",
+        "memo": "VARCHAR",
+        "pid": "INTEGER",
+        "isspecial": "CHAR",
+        "uid": "INTEGER",
+        "balance": "DECIMAL",
+        "obj_account_type": "CHAR",
+        "business_type": "CHAR",
+        "isdelayflow": "TINYINT",
+        "objpay_code": "CHAR",
+        "id": "INTEGER",
+        "operate_time": "TIMESTAMP",
+        "amount": "DECIMAL",
+        "orderid": "VARCHAR",
+        "submit_time": "TIMESTAMP",
+        "objbid": "INTEGER",
+        "trade_sub_code": "VARCHAR",
+        "objcid": "INTEGER",
+        "objpid": "INTEGER",
+        "objuid": "INTEGER",
+        "bid": "INTEGER",
+        "operatorid": "INTEGER",
+        "cid": "INTEGER"
+    },
+    "eventType": "INSERT",
+    "executeTime": 1539760039000,
+    "primaryKeys": [
+        "id",
+        "trade_sub_code"
+    ],
+    "schema": "test1",
+    "sendTime": 1539760039433,
+    "table": "example6_json"
+}
+规则1：NULL字段会被过滤  在消费端可以不解析该字段  在ColumnValue数组中没有该字段
+
+{
+    "columns": {},
+    "columnsType": {},
+    "eventType": "ALTER",
+    "executeTime": 1547454414000,
+    "primaryKeys": [],
+    "schema": "test1",
+    "sendTime": 1547454519513,
+    "sql": "ALTER TABLE `test1`.`example6_json`  CHANGE COLUMN `addr4` `addr4` varchar(100) DEFAULT NULL",
+    "table": "example6_json"
+}
+
+测试环境部署node节点  172.20.100.183
+生产环境  manager 172.20.5.22   node 172.20.5.22 172.20.5.23  文件目录  /home/projects/otter   日志目录/hdd2/otter/logs/node/node.log
+
+
+打包：
+进入$otter_home目录
+执行：mvn clean install -Dmaven.test.skip -Denv=release
+发布包位置：$otter_home/target
+
+
+otter.manager.address = 172.20.5.22:1099
+ node 172.20.5.22  db6   55   nid   3
+      172.20.5.23  db7   56   nid   4
+
+上传方法   rz   文件名用aaa.zip    上传至  otter/node    解压  unzip  file.zip  解压  tar -zxvf node.tar.gz
+
+
+关于预警方面的解析：
+基本流程：定时插入数据   selfMonitor.start
+查询数据库  对比超时时间   满足条件放到队列
+AbstractAlarmService.sendAlarmInternal
+另外一个定是消费  发送邮件   从队列取数据 满足条件发送邮件
+
+
+
+消息接受  acceptEvent  消息发送  endpoint.call
+
+测试环境
+数据源账户密码：UATbinlog123!  uatbinlog
+
+测试环境manager   172.20.100.183:8088
+
+
+
+DubboCommunicationConnectionFactory

@@ -74,7 +74,6 @@ public class DistributedReentrantLockTest extends BaseEventTest {
                 }
             });
         }
-
         try {
             latch.await();
         } catch (InterruptedException e) {

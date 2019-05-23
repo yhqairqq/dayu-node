@@ -3,6 +3,7 @@ package com.alibaba.otter.node.etl.load.loader.mq;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.otter.node.common.config.ConfigClientService;
 import com.alibaba.otter.node.etl.common.db.dialect.DbDialect;
+import com.alibaba.otter.node.etl.common.db.dialect.DbDialectFactory;
 import com.alibaba.otter.node.etl.common.db.dialect.mysql.MysqlDialect;
 import com.alibaba.otter.node.etl.common.db.utils.SqlUtils;
 import com.alibaba.otter.node.etl.common.mq.dialect.MqDialect;
@@ -12,16 +13,20 @@ import com.alibaba.otter.node.etl.load.loader.LoadStatsTracker;
 import com.alibaba.otter.node.etl.load.loader.db.DbLoadData;
 import com.alibaba.otter.node.etl.load.loader.db.DbLoadDumper;
 import com.alibaba.otter.node.etl.load.loader.db.DbLoadMerger;
+import com.alibaba.otter.node.etl.load.loader.db.context.DbLoadContext;
 import com.alibaba.otter.node.etl.load.loader.interceptor.LoadInterceptor;
 import com.alibaba.otter.node.etl.load.loader.mq.context.MqLoadContext;
 import com.alibaba.otter.node.etl.load.loader.weight.WeightBuckets;
 import com.alibaba.otter.node.etl.load.loader.weight.WeightController;
 import com.alibaba.otter.node.extend.load.mq.MessageConvertUtils;
 import com.alibaba.otter.node.extend.load.mq.MessageOutType;
+import com.alibaba.otter.node.extend.load.mq.model.JsonModel;
 import com.alibaba.otter.shared.arbitrate.impl.zookeeper.ZooKeeperClient;
 import com.alibaba.otter.shared.common.model.config.ConfigHelper;
 import com.alibaba.otter.shared.common.model.config.channel.Channel;
+import com.alibaba.otter.shared.common.model.config.data.DataMedia;
 import com.alibaba.otter.shared.common.model.config.data.DataMediaPair;
+import com.alibaba.otter.shared.common.model.config.data.db.DbMediaSource;
 import com.alibaba.otter.shared.common.model.config.data.mq.MqMediaSource;
 import com.alibaba.otter.shared.common.model.config.pipeline.Pipeline;
 import com.alibaba.otter.shared.common.utils.thread.NamedThreadFactory;
@@ -43,6 +48,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.StatementCallback;
 import org.springframework.jdbc.core.StatementCreatorUtils;
 import org.springframework.jdbc.support.lob.LobCreator;
 import org.springframework.util.Assert;
@@ -52,6 +59,9 @@ import java.io.Serializable;
 import java.sql.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.LockSupport;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by yanghuanqing@wdai.com on 2018/4/26.
@@ -69,6 +79,7 @@ public class MqLoadAction implements InitializingBean, DisposableBean {
     private LoadInterceptor interceptor;
     private ExecutorService executor;
     private ConfigClientService configClientService;
+    private DbDialectFactory dbDialectFactory;
     private int batchSize = 50;
     private boolean useBatch = true;
     private LoadStatsTracker loadStatsTracker;
@@ -103,7 +114,8 @@ public class MqLoadAction implements InitializingBean, DisposableBean {
             // 处理下ddl语句，ddl/dml语句不可能是在同一个batch中，由canal进行控制
             // 主要考虑ddl的幂等性问题，尽可能一个ddl一个batch，失败或者回滚都只针对这条sql
             if (isDdlDatas(datas)) {
-//                doDdl(context, datas);
+                MqLoadAction.MqLoadWorker worker = new MqLoadAction.MqLoadWorker(context, datas, false);
+                Exception exception = worker.call();
             } else {
                 WeightBuckets<EventData> buckets = buildWeightBuckets(context, datas);
                 List<Long> weights = buckets.weights();
@@ -124,7 +136,7 @@ public class MqLoadAction implements InitializingBean, DisposableBean {
                     // 预处理下数据
 
                     // 进行一次数据合并，合并相同pk的多次I/U/D操作
-                    items = DbLoadMerger.merge(items);
+//                    items = DbLoadMerger.merge(items);
                     // 按I/U/D进行归并处理
                     DbLoadData loadData = new DbLoadData();
                     doBefore(items, context, loadData);
@@ -145,6 +157,40 @@ public class MqLoadAction implements InitializingBean, DisposableBean {
         }
 
         return context;// 返回处理成功的记录
+    }
+
+    /**
+     * 执行ddl的调用，处理逻辑比较简单: 串行调用
+     *
+     * @param context
+     * @param eventDatas
+     */
+    private void doDdl(DbLoadContext context, List<EventData> eventDatas) {
+        for (final EventData data : eventDatas) {
+            DataMedia dataMedia = ConfigHelper.findDataMedia(context.getPipeline(), data.getTableId());
+            final DbDialect dbDialect = dbDialectFactory.getDbDialect(context.getIdentity().getPipelineId(),
+                    (DbMediaSource) dataMedia.getSource());
+            Boolean skipDdlException = context.getPipeline().getParameters().getSkipDdlException();
+            try {
+                boolean result = false;
+
+
+                if (result) {
+                    context.getProcessedDatas().add(data); // 记录为成功处理的sql
+                } else {
+                    context.getFailedDatas().add(data);
+                }
+
+            } catch (Throwable e) {
+                if (skipDdlException) {
+                    // do skip
+                    logger.warn("skip exception for ddl : {} , caused by {}", data, ExceptionUtils.getFullStackTrace(e));
+                } else {
+                    throw new LoadException(e);
+                }
+            }
+
+        }
     }
 
     private MqLoadContext buildContext(Identity identity) {
@@ -216,7 +262,6 @@ public class MqLoadAction implements InitializingBean, DisposableBean {
                 }
             }
         }
-
         if (context.getPipeline().getParameters().isDryRun()) {
             doDryRun(context, batchDatas, true);
         } else {
@@ -449,6 +494,7 @@ public class MqLoadAction implements InitializingBean, DisposableBean {
         private List<EventData> allProcesedDatas = new ArrayList<EventData>();
         private List<EventData> processedDatas = new ArrayList<EventData>();
         private List<EventData> failedDatas = new ArrayList<EventData>();
+        private DbMediaSource source;
 
         public MqLoadWorker(MqLoadContext context, List<EventData> datas, boolean canBatch) {
             this.context = context;
@@ -457,7 +503,8 @@ public class MqLoadAction implements InitializingBean, DisposableBean {
 
             EventData data = datas.get(0); // eventData为同一数据库的记录，只取第一条即可
             MqMediaSource dataMediaSource = (MqMediaSource) context.getDataMediaSource();
-            mqDialect = new KafkaDialect(dataMediaSource.getUrl(), data.getSchemaName() + "." + data.getTableName(), -1);
+            source = (DbMediaSource) context.getPipeline().getPairs().get(0).getSource().getSource();
+            mqDialect = new KafkaDialect(dataMediaSource.getUrl(), data.getSchemaName(), -1);
 
         }
 
@@ -480,16 +527,13 @@ public class MqLoadAction implements InitializingBean, DisposableBean {
             Producer producer = (Producer) mqDialect.getProducer();
             for (final EventData eventData : datas) {
                 send(eventData, producer);
-                System.out.println(JSONObject.toJSON(eventData));
             }
-
             if (!CollectionUtils.isEmpty(failedDatas)) {
                 allFailedDatas.clear();
                 allFailedDatas.addAll(failedDatas);
                 failedDatas.clear();
+                exeResult = ExecuteResult.RETRY;
             }
-
-
             while (exeResult == ExecuteResult.RETRY && retryCount < 3) {
                 for (final EventData eventData : allFailedDatas) {
                     send(eventData, producer);
@@ -502,7 +546,6 @@ public class MqLoadAction implements InitializingBean, DisposableBean {
                 } else {
                     exeResult = ExecuteResult.SUCCESS;
                 }
-
                 retryCount++;
             }
             // 记录一下当前处理过程中失败的记录,affect = 0的记录
@@ -510,56 +553,57 @@ public class MqLoadAction implements InitializingBean, DisposableBean {
             context.getProcessedDatas().addAll(allProcesedDatas);
             return null;
         }
-
-
         private String parseEventData(EventData eventData) {
-
-            try{
-                int totalPartition = 3;
-                ZkUtils zkUtils = ZkUtils.apply(zooKeeperClient.getServerAddrs().get(0), 30000, 30000, JaasUtils.isZkSecurityEnabled());
-                scala.collection.Seq<String> topics =   zkUtils.getAllTopics();
-                if(!topics.contains(mqDialect.getTopic())){
-                    // 创建一个单分区单副本名为t1的topic
-                    AdminUtils.createTopic(zkUtils, mqDialect.getTopic(), totalPartition, totalPartition, new Properties(), RackAwareMode.Enforced$.MODULE$);
-// 获取topic 'test'的topic属性属性
-                }
-            }catch (TopicExistsException existsException){
-                System.out.println("topic已经创建");
-            }
             MessageOutType messageOutType = MessageOutType.JSON;
             if (mqDialect.getTopic().toLowerCase().endsWith(MessageOutType.CSV.name().toLowerCase())) {
                 messageOutType = MessageOutType.CSV;
             }
-            return MessageConvertUtils.toParse(eventData, messageOutType);
+            Object result = MessageConvertUtils.toParse(eventData, messageOutType);
+            if (result instanceof JsonModel) {
+                ((JsonModel) result).setIp(ip(source.getUrl()));
+            }
+
+            return JSONObject.toJSONString(result);
         }
-
-
         private void send(EventData eventData, Producer producer) {
             String message = parseEventData(eventData);
-            logger.info(message);
-
-            int totalPartition = 3;
-
-            int targetPartition =   ((totalPartition-1)&mqDialect.getTopic().hashCode());
-
+            System.out.println(message);
+            int totalPartition = 9;
+            int targetPartition = generatePartition(totalPartition, eventData.getTableName());
+            //Math.abs(((totalPartition - 1) & eventData.getTableName().hashCode()));
             ProducerRecord<String, String> record
-                    = new ProducerRecord<String, String>(mqDialect.getTopic(),targetPartition, null,message);
+                    = new ProducerRecord<String, String>(mqDialect.getTopic() + "SyncLibrary", targetPartition, null, message);
             doSend(producer, record, eventData);
         }
+
+        private void createTopic() {
+            try {
+                int totalPartition = 12;
+                int replicationFactor = 3;
+                ZkUtils zkUtils = ZkUtils.apply(zooKeeperClient.getServerAddrs().get(0), 30000, 30000, JaasUtils.isZkSecurityEnabled());
+                scala.collection.Seq<String> topics = zkUtils.getAllTopics();
+                if (!topics.contains(mqDialect.getTopic())) {
+                    // 创建一个单分区单副本名为t1的topic
+                    AdminUtils.createTopic(zkUtils, mqDialect.getTopic(), totalPartition, replicationFactor, new Properties(), RackAwareMode.Enforced$.MODULE$);
+// 获取topic 'test'的topic属性属性
+                }
+            } catch (TopicExistsException existsException) {
+                logger.info("topic已经创建");
+            }
+        }
+
+        private int generatePartition(int total, String seed) {
+            int hashcode = seed.hashCode();
+            hashcode = Math.abs(hashcode);
+            return hashcode % (total - 1);
+        }
+
         private void doSend(Producer producer, ProducerRecord<String, String> record, final EventData eventData) {
-            producer.send(record,
-                    new Callback() {
-                        public void onCompletion(RecordMetadata metadata, Exception e) {
-                            if (e != null) {
-                                failedDatas.add(eventData);
-                            }
-                            //写出记一次成功
-                            int effect = 1;
-                            processStat(eventData, effect, false);
-                            allProcesedDatas.addAll(processedDatas);
-                            processedDatas.clear();
-                        }
-                    });
+            producer.send(record);
+            int effect = 1;
+            processStat(eventData, effect, false);
+            allProcesedDatas.addAll(processedDatas);
+            processedDatas.clear();
         }
 
         private void doPreparedStatement(PreparedStatement ps, DbDialect dbDialect, LobCreator lobCreator,
@@ -758,5 +802,18 @@ public class MqLoadAction implements InitializingBean, DisposableBean {
         this.useBatch = useBatch;
     }
 
+    /**
+     * 判断是否为合法IP * @return the ip
+     */
+    public static String ip(String param) {
+        String ip = "jdbc:mysql://(?<ip>[\\d*\\.]*):";
+        Pattern pattern = Pattern.compile(ip);
+        Matcher matcher = pattern.matcher(param);
+        while (matcher.find()) {
+            String result = matcher.group("ip");
+            return result;
+        }
+        return  null;
 
+    }
 }

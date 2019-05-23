@@ -60,7 +60,6 @@ public class ExtractTask extends GlobalTask {
                         if (profiling) {
                             profilingStartTime = System.currentTimeMillis();
                         }
-
                         MDC.put(OtterConstants.splitPipelineLogFileKey, String.valueOf(pipelineId));
                         String currentName = Thread.currentThread().getName();
                         Thread.currentThread().setName(createTaskName(pipelineId, "ExtractWorker"));
@@ -86,9 +85,9 @@ public class ExtractTask extends GlobalTask {
                                 dbBatch.setFileBatch(fileBatch);
                             }
 
+
                             List<PipeKey> pipeKeys = rowDataPipeDelegate.put(dbBatch, nextNodeId);
                             etlEventData.setDesc(pipeKeys);
-
                             if (profiling) {
                                 Long profilingEndTime = System.currentTimeMillis();
                                 stageAggregationCollector.push(pipelineId,

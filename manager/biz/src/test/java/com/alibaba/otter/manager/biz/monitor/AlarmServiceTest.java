@@ -17,7 +17,7 @@ public class AlarmServiceTest extends BaseOtterTest {
     public void test_simple() {
         AlarmMessage data = new AlarmMessage();
         data.setMessage("this is test");
-        data.setReceiveKey("jianghang.loujh@alibaba-inc.com");
+        data.setReceiveKey("yanghuanqing@wdai.com");
         try {
             alarmService.doSend(data);
         } catch (Exception e) {

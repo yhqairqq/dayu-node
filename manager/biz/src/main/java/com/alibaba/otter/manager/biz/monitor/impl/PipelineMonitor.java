@@ -56,6 +56,10 @@ public class PipelineMonitor implements Monitor {
     @Resource(name = "arbitrateManageService")
     private ArbitrateManageService arbitrateManageService;
 
+
+    @Resource(name="exceptionRuleMonitor")
+    private ExceptionRuleMonitor exceptionRuleMonitor;
+
     @Override
     public void explore(List<AlarmRule> rules) {
         Long pipelineId = rules.get(0).getPipelineId();
@@ -119,6 +123,9 @@ public class PipelineMonitor implements Monitor {
 
         if (!positionTimeoutRules.isEmpty()) {
             positionTimeoutRuleMonitor.explore(positionTimeoutRules);
+        }
+        if(!exceptonRules.isEmpty()){
+            exceptionRuleMonitor.explore(exceptonRules);
         }
 
     }

@@ -12,6 +12,7 @@ public class HintEventProcessor extends AbstractEventProcessor {
 
     public boolean process(EventData eventData) {
         eventData.setHint("/* hint */");
+        System.out.println("hithithithith");
         return true;
     }
 }

@@ -35,7 +35,7 @@ import com.alibaba.otter.shared.etl.model.Identity;
 
 /**
  * loader执行工厂，可根据不同的数据load进行路由到指定的{@linkplain OtterLoader}进行处理
- * 
+ *
  * @author simon 2012-7-3 下午4:16:58
  * @version 4.1.0
  */
@@ -47,12 +47,16 @@ public class OtterLoaderFactory {
 
     public List<LoadContext> load(DbBatch dbBatch) {
         try {
+//            System.out.println("开始批次："+dbBatch.getRowBatch().getIdentity().getProcessId());
             return dataBatchLoader.load(dbBatch);
+
         } finally {
             try {
                 sendStat(dbBatch.getRowBatch().getIdentity());
+//                System.out.println("发送批次："+dbBatch.getRowBatch().getIdentity().getProcessId());
             } finally {
                 loadStatsTracker.removeStat(dbBatch.getRowBatch().getIdentity());
+//                System.out.println("=================================");
             }
         }
 

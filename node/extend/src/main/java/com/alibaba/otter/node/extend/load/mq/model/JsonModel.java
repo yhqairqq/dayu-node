@@ -1,7 +1,9 @@
 package com.alibaba.otter.node.extend.load.mq.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -12,11 +14,13 @@ public class JsonModel implements Serializable {
     private String schema;
     private String table;
     private String eventType;
-    private String primaryKey;
+    private List<String> primaryKeys = new ArrayList<>(0);
     private long executeTime;
     private long sendTime;
+    private String sql;
     private Map<String, Object> columns = new HashMap<String, Object>(0);
     private Map<String, Object> columnsType = new HashMap<String, Object>(0);
+    private String ip;
 
     public String getSchema() {
         return schema;
@@ -42,12 +46,12 @@ public class JsonModel implements Serializable {
         this.eventType = eventType;
     }
 
-    public String getPrimaryKey() {
-        return primaryKey;
+    public List<String> getPrimaryKeys() {
+        return primaryKeys;
     }
 
-    public void setPrimaryKey(String primaryKey) {
-        this.primaryKey = primaryKey;
+    public void setPrimaryKeys(List<String> primaryKey) {
+        this.primaryKeys = primaryKey;
     }
 
     public long getExecuteTime() {
@@ -80,5 +84,21 @@ public class JsonModel implements Serializable {
 
     public void setColumnsType(Map<String, Object> columnsType) {
         this.columnsType = columnsType;
+    }
+
+    public String getSql() {
+        return sql;
+    }
+
+    public void setSql(String sql) {
+        this.sql = sql;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 }

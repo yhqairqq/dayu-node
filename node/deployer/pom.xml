@@ -33,6 +33,10 @@
 			<artifactId>node.extend</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.alibaba.fastsql</groupId>
+			<artifactId>fastsql</artifactId>
+		</dependency>
 	</dependencies>
 	
 	<build>

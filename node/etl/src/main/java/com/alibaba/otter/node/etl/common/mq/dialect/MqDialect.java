@@ -15,4 +15,5 @@ public interface MqDialect<Producer> {
 
     String getTopic();
 
+
 }

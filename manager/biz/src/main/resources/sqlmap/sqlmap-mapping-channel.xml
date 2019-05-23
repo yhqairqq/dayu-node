@@ -4,7 +4,7 @@
 
 <sqlMap namespace="com.alibaba.otter.manager.biz.config.channel.dal.dataobject.ChannelDO">
 	<typeAlias alias="channel"
-		type="com.alibaba.otter.manager.biz.config.channel.dal.dataobject.ChannelDO" />
+		      type="com.alibaba.otter.manager.biz.config.channel.dal.dataobject.ChannelDO" />
 
 	<resultMap id="channelResult" class="channel">
 		<result property="id" column="ID" />

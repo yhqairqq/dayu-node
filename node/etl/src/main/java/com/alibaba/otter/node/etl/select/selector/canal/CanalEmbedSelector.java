@@ -57,7 +57,7 @@ import com.alibaba.otter.shared.etl.model.EventData;
 
 /**
  * 基于canal embed实现数据获取方式
- * 
+ *
  * @author jianghang 2012-7-31 下午02:45:15
  * @version 4.1.0
  */

@@ -45,11 +45,23 @@ public class LoadStatsTracker {
     }
 
     public LoadThroughput getStat(Identity identity) {
-        return throughputs.get(identity);
+//        if(!throughputs.containsKey(identity)){
+//            System.out.println(Thread.currentThread().getName()+"getStat 该批次"+identity.getProcessId()+"号不存在");
+//        }
+        LoadThroughput result =  throughputs.get(identity);
+//        System.out.println(Thread.currentThread().getName()+"getstat 批次:"+identity.getProcessId()+"加入缓存");
+//        System.out.println(Thread.currentThread().getName()+"getStat 缓存数量:"+throughputs.size());
+        return result;
     }
 
     public void removeStat(Identity identity) {
+//        if(!throughputs.containsKey(identity)){
+//            System.out.println(Thread.currentThread().getName()+"removeStat 该批次"+identity.getProcessId()+"号不存在");
+//        }
+
         throughputs.remove(identity);
+//        System.out.println(Thread.currentThread().getName()+"删除批次:"+identity.getProcessId());
+//        System.out.println(Thread.currentThread().getName()+"removeStat 缓存数量:"+throughputs.size());
     }
 
     public static class LoadThroughput {
@@ -59,6 +71,8 @@ public class LoadStatsTracker {
         private Map<Long, LoadCounter> counters;
 
         public LoadThroughput(Identity identity){
+
+            this.identity = identity;
             counters = MigrateMap.makeComputingMap(new Function<Long, LoadCounter>() {
 
                 public LoadCounter apply(Long pairId) {
@@ -88,6 +102,7 @@ public class LoadStatsTracker {
         }
 
         public void setStartTime(Long startTime) {
+//            System.out.println("开始时间戳:"+startTime);
             this.startTime = startTime;
         }
 

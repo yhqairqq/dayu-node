@@ -1,5 +1,7 @@
 package com.alibaba.otter.manager.biz.monitor.impl;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -19,7 +21,7 @@ import com.alibaba.otter.shared.common.utils.thread.NamedThreadFactory;
 
 /**
  * jvm内自动运行，不需要通过外部定时触发
- * 
+ *
  * @author jianghang 2013-9-6 上午10:22:28
  * @since 4.2.2
  */
@@ -31,7 +33,7 @@ public class SelfMonitor implements Monitor, InitializingBean, DisposableBean {
     private ScheduledFuture          future;
     private GlobalMonitor            monitor;
     private AtomicBoolean            enable       = new AtomicBoolean(true);
-    private int                      interval     = 120;
+    private int                      interval     = 10;
 
     public void explore() {
         monitor.explore();
@@ -67,7 +69,8 @@ public class SelfMonitor implements Monitor, InitializingBean, DisposableBean {
 
                 public void run() {
                     try {
-                        monitor.explore();// 定时调用 
+//                        System.out.println("监控心跳+"+new SimpleDateFormat("HH:mm:ss").format(new Date()));
+                        monitor.explore();// 定时调用
                     } catch (Exception e) {
                         log.error("self-monitor failed.", e);
                     }

@@ -29,7 +29,7 @@ import com.alibaba.otter.shared.common.utils.OtterToStringStyle;
 
 /**
  * 全局参数定义
- * 
+ *
  * @author jianghang 2012-4-9 下午01:51:04
  * @version 4.0.2
  */
@@ -51,7 +51,7 @@ public class SystemParameter implements Serializable {
     private String              usArandaCluster        = "";                                 // 美国aranda集群地址
     private RetrieverType       retriever              = RetrieverType.ARIA2C;               // 下载方式
     private String              defaultAlarmReceiveKey = "otterteam";
-    private String              defaultAlarmReceiver   = "jianghang115@gmail.com";
+    private String              defaultAlarmReceiver   = "yanghuanqing@wdai.com";
     private Map<String, String> alarmReceiver          = new LinkedHashMap<String, String>(); // 报警联系人
 
     public static enum RetrieverType {

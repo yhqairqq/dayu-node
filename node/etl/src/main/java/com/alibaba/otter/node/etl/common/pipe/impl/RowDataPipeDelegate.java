@@ -71,7 +71,6 @@ public class RowDataPipeDelegate {
             Pipeline pipeline = configClientService.findPipeline(data.getRowBatch().getIdentity().getPipelineId());
             if (data.getFileBatch() != null && !CollectionUtils.isEmpty(data.getFileBatch().getFiles())) {
                 future = executorService.submit(new Callable<PipeKey>() {
-
                     public PipeKey call() throws Exception {
                         try {
                             MDC.put(OtterConstants.splitPipelineLogFileKey,
