@@ -7,7 +7,7 @@
 			</pattern>
 		</encoder>
 	</appender>
-	
+
 	<appender name="TASK-ROOT" class="ch.qos.logback.classic.sift.SiftingAppender">
 		<discriminator>
 			<Key>otter</Key>
@@ -35,7 +35,7 @@
 			</appender>
 		</sift>
 	</appender>
-	
+
 	<appender name="DB_LOG" class="ch.qos.logback.classic.sift.SiftingAppender">
 		<discriminator>
 			<Key>load</Key>
@@ -60,7 +60,7 @@
 			</appender>
 		</sift>
 	</appender>
-	
+
 	<appender name="FILE_LOG" class="ch.qos.logback.classic.sift.SiftingAppender">
 		<discriminator>
 			<Key>load</Key>
@@ -85,7 +85,7 @@
 			</appender>
 		</sift>
 	</appender>
-	
+
 	<appender name="FILE_MISS_LOG" class="ch.qos.logback.classic.sift.SiftingAppender">
 		<discriminator>
 			<Key>load</Key>
@@ -110,7 +110,7 @@
 			</appender>
 		</sift>
 	</appender>
-	
+
 	<appender name="SELECTOR_LOG" class="ch.qos.logback.classic.sift.SiftingAppender">
 		<discriminator>
 			<Key>select</Key>
@@ -135,7 +135,7 @@
 			</appender>
 		</sift>
 	</appender>
-	
+
 	<appender name="FILE_WAIT" class="ch.qos.logback.classic.sift.SiftingAppender">
 		<discriminator>
 			<Key>otter</Key>
@@ -160,51 +160,51 @@
 			</appender>
 		</sift>
 	</appender>
-	
-	<logger name="com.alibaba.otter.node.etl.load.loader.db.interceptor.log.LogLoadInterceptor" additivity="false">  
-        <level value="INFO" />  
+
+	<logger name="com.alibaba.otter.node.etl.load.loader.db.interceptor.log.LogLoadInterceptor" additivity="false">
+        <level value="INFO" />
         <appender-ref ref="DB_LOG" />
     </logger>
-    <logger name="com.alibaba.otter.node.etl.load.loader.db.FileLoadAction" additivity="false">  
-        <level value="INFO" />  
+    <logger name="com.alibaba.otter.node.etl.load.loader.db.FileLoadAction" additivity="false">
+        <level value="INFO" />
         <appender-ref ref="FILE_LOG" />
     </logger>
-    <logger name="com.alibaba.otter.node.etl.select.selector.canal.CanalEmbedSelector" additivity="false">  
-        <level value="INFO" />  
+    <logger name="com.alibaba.otter.node.etl.select.selector.canal.CanalEmbedSelector" additivity="false">
+        <level value="INFO" />
         <appender-ref ref="SELECTOR_LOG" />
     </logger>
-    <logger name="com.alibaba.otter.node.etl.common.pipe.impl.http.AttachmentHttpPipe" additivity="false">  
-        <level value="INFO" />  
+    <logger name="com.alibaba.otter.node.etl.common.pipe.impl.http.AttachmentHttpPipe" additivity="false">
+        <level value="INFO" />
         <appender-ref ref="FILE_MISS_LOG" />
     </logger>
-    <logger name="com.alibaba.otter.node.etl.conflict.impl.FileBatchConflictDetectServiceImpl" additivity="false">  
-        <level value="INFO" />  
+    <logger name="com.alibaba.otter.node.etl.conflict.impl.FileBatchConflictDetectServiceImpl" additivity="false">
+        <level value="INFO" />
         <appender-ref ref="FILE_MISS_LOG" />
     </logger>
-    <logger name="com.alibaba.otter.node.deployer.OtterLauncher" additivity="false">  
-        <level value="INFO" />  
+    <logger name="com.alibaba.otter.node.deployer.OtterLauncher" additivity="false">
+        <level value="INFO" />
         <appender-ref ref="TASK-ROOT" />
     </logger>
-    <logger name="com.alibaba.dubbo.rpc.support.RpcUtils" additivity="false">  
-     	<level value="error" />  
+    <logger name="com.alibaba.dubbo.rpc.support.RpcUtils" additivity="false">
+     	<level value="error" />
         <appender-ref ref="TASK-ROOT" />
     </logger>
 
-    <logger name="com.alibaba.otter.shared.common.utils.thread.ExecutorTemplate" additivity="false">  
-        <level value="INFO" />  
+    <logger name="com.alibaba.otter.shared.common.utils.thread.ExecutorTemplate" additivity="false">
+        <level value="INFO" />
         <appender-ref ref="FILE_WAIT" />
     </logger>
-    <logger name="com.alibaba.otter.canal.server.embeded.CanalServerWithEmbeded" additivity="false">  
-        <level value="INFO" />  
+    <logger name="com.alibaba.otter.canal.server.embeded.CanalServerWithEmbeded" additivity="false">
+        <level value="INFO" />
         <appender-ref ref="TASK-ROOT" />
     </logger>
-    <logger name="com.alibaba.otter.node.etl.select.SelectTask" additivity="false">  
-        <level value="INFO" />  
+    <logger name="com.alibaba.otter.node.etl.select.SelectTask" additivity="false">
+        <level value="INFO" />
         <appender-ref ref="TASK-ROOT" />
     </logger>
 
-     
-	<root level="WARN">
+
+	<root level="INFO">
 
 		<appender-ref ref="STDOUT"/>
 

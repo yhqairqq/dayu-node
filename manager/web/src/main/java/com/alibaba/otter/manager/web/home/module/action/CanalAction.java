@@ -79,6 +79,7 @@ public class CanalAction extends AbstractAction {
             String[] dbAddresses = StringUtils.split(dbAddressesString, ";");
             for (String dbAddressString : dbAddresses) {
                 List<DataSourcing> groupDbSocketAddress = new ArrayList<DataSourcing>();
+                //多库合并配置 (逗号分隔) 多库合并配置： 10.20.144.34:3306,10.20.144.35:3306; (逗号分隔)
                 String[] groupDbAddresses = StringUtils.split(dbAddressString, ",");
                 for (String groupDbAddress : groupDbAddresses) {
                     String strs[] = StringUtils.split(groupDbAddress, ":");
@@ -194,7 +195,7 @@ public class CanalAction extends AbstractAction {
 
     /**
      * 删除canal
-     * 
+     *
      * @param canalId
      * @throws WebxException
      */

@@ -171,3 +171,48 @@ AbstractAlarmService.sendAlarmInternal
 
 
 DubboCommunicationConnectionFactory
+
+
+元数据存放地址：
+10.111.14.140  3307  otter  和otter_sink
+re_write   IXAaaWWiZhn1Nces
+
+cloud01-dev-otter-00 10.111.31.239  部署主机
+
+| Log_name         | Pos  | Event_type     | Server_id | End_log_pos | Info
+https://dev.mysql.com/doc/internals/en/com-register-slave.html   binlog 协议
+https://blog.csdn.net/huyangyamin/article/details/53747947
+https://blog.csdn.net/u013256816/article/details/53020335
+show master status;
+show binlog events in “mysql-bin.000005”;
+show master logs;
+ show binary logs;
+FORMAT_DESCRIPTION_EVENT
+
+对各种binlog_event事件的解释
+
+canal 第一步注册成为master的slave MysqlConnection
+
+获取事件binlog_event
+DirectLogFetcher ->LogBuffer -LogDecoder  一个字节8位  读四个字节需要32位
+
+过滤器 AviaterRegexFilter
+filter-> canal  EmbedSelecteor->   CanalFilterSupport.makeFilterExpression(pip)
+cannalInstanceWithManager->filter AviaterFilter(filter) -> abstractEventParser
+LogEventConvert -> aviaterFilter
+
+
+
+-->LogEventConvert parseRowsEvent中直接进行过滤订阅的数据库和表
+LogDecoder  TABLE_MAP_EVENT-> WRITE_ROWS_EVENT_V1  将fetch 转换成event  在此过程中将没有订阅的表进行过滤
+
+LogEventConvert  binlogParser.parser在此过程中将没有订阅的表进行过滤  过滤通过的数据转换成entry 存储到transactionBuffer中
+func.sink->binlogParser(LogEventConvert)  将event 转换成entry 并且缓存到store
+
+| mysql-bin.000003 | 5171664 | Table_map      |         1 |     5171725 | table_id: 128 (otter.delay_stat)
+| mysql-bin.000003 | 5171725 | Write_rows     |         1 |     5171801 | table_id: 128 flags: STMT_END_F                                                                     |
+| mysql-bin.000003 | 5171978 | Table_map      |         1 |     5172050 | table_id: 133 (otter.log_record)
+| mysql-bin.000003 | 5172050 | Write_rows     |         1 |     5172195 | table_id: 133 flags: STMT_END_F
+
+
+DataSourceChecker 表结构元数据的准确性

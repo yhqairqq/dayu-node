@@ -500,12 +500,10 @@ public class MqLoadAction implements InitializingBean, DisposableBean {
             this.context = context;
             this.datas = datas;
             this.canBatch = canBatch;
-
             EventData data = datas.get(0); // eventData为同一数据库的记录，只取第一条即可
             MqMediaSource dataMediaSource = (MqMediaSource) context.getDataMediaSource();
             source = (DbMediaSource) context.getPipeline().getPairs().get(0).getSource().getSource();
             mqDialect = new KafkaDialect(dataMediaSource.getUrl(), data.getSchemaName(), -1);
-
         }
 
         public Exception call() throws Exception {
@@ -562,7 +560,6 @@ public class MqLoadAction implements InitializingBean, DisposableBean {
             if (result instanceof JsonModel) {
                 ((JsonModel) result).setIp(ip(source.getUrl()));
             }
-
             return JSONObject.toJSONString(result);
         }
         private void send(EventData eventData, Producer producer) {

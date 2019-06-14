@@ -272,7 +272,6 @@ public class CanalEmbedSelector implements OtterSelector {
                 startPosition = buildPositionForDump(message.getEntries().get(0));
                 endPosition = buildPositionForDump(message.getEntries().get(message.getEntries().size() - 1));
             }
-
             dumpMessages(result, startPosition, endPosition, message.getEntries().size());// 记录一下，方便追查问题
         }
         return result;
@@ -305,6 +304,7 @@ public class CanalEmbedSelector implements OtterSelector {
         try {
             MDC.put(OtterConstants.splitPipelineSelectLogFileKey, String.valueOf(pipelineId));
             logger.info(SEP + "****************************************************" + SEP);
+
             logger.info(MessageDumper.dumpMessageInfo(message, startPosition, endPosition, total));
             logger.info("****************************************************" + SEP);
             if (dumpDetail) {// 判断一下是否需要打印详细信息

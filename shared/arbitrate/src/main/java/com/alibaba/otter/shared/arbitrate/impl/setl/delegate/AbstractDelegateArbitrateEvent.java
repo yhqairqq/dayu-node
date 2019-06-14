@@ -26,7 +26,7 @@ import com.alibaba.otter.shared.common.model.config.pipeline.PipelineParameter.A
 
 /**
  * delegate一些共用的判断摸索
- * 
+ *
  * @author jianghang 2012-9-28 上午10:07:16
  * @version 4.1.0
  */

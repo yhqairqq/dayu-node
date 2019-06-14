@@ -1,6 +1,6 @@
 <configuration scan="true" scanPeriod=" 5 seconds">
 	<jmxConfigurator />
-	
+
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{requestURIWithQueryString}] %-5level %logger{56} - %msg%n</pattern>
@@ -23,7 +23,7 @@
           <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{requestURIWithQueryString}] %-5level %logger{56} - %msg%n</pattern>
         </encoder>
 	</appender>
-	
+
 	<appender name="COMMUNICATION" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<append>true</append>
         <file>../logs/communication.log</file>
@@ -41,7 +41,7 @@
           <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{56} - %msg%n</pattern>
         </encoder>
 	</appender>
-	
+
 	<appender name="ALARM" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<append>true</append>
         <file>../logs/alarm.log</file>
@@ -111,36 +111,36 @@
         </encoder>
 	</appender>
 
-	<logger name="com.alibaba.otter.shared.communication.core" additivity="false">  
-        <level value="info" />  
+	<logger name="com.alibaba.otter.shared.communication.core" additivity="false">
+        <level value="debug" />
         <appender-ref ref="COMMUNICATION" />
     </logger>
-	<logger name="com.alibaba.otter.manager.biz.common.alarm" additivity="false">  
-        <level value="info" />  
+	<logger name="com.alibaba.otter.manager.biz.common.alarm" additivity="false">
+        <level value="debug" />
         <appender-ref ref="ALARM" />
     </logger>
-    <logger name="monitorInfo" additivity="false">  
-        <level value="info" />  
+    <logger name="monitorInfo" additivity="false">
+        <level value="debug" />
         <appender-ref ref="monitorInfo" />
     </logger>
-    <logger name="monitorTrigger" additivity="false">  
-        <level value="error" />  
+    <logger name="monitorTrigger" additivity="false">
+        <level value="error" />
         <appender-ref ref="monitorTrigger" />
     </logger>
-	<logger name="com.alibaba.otter.manager.web.home.module.action.PositionAction" additivity="false">  
-        <level value="info" />  
+	<logger name="com.alibaba.otter.manager.web.home.module.action.PositionAction" additivity="false">
+        <level value="debug" />
         <appender-ref ref="position" />
     </logger>
-    <logger name="com.alibaba.otter.manager.deployer" additivity="false">  
-        <level value="info" />  
+    <logger name="com.alibaba.otter.manager.deployer" additivity="false">
+        <level value="debug" />
         <appender-ref ref="WEBX-ROOT" />
     </logger>
-    <logger name="com.alibaba.dubbo.rpc.support.RpcUtils" additivity="false">  
-     	<level value="error" />  
+    <logger name="com.alibaba.dubbo.rpc.support.RpcUtils" additivity="false">
+     	<level value="error" />
         <appender-ref ref="WEBX-ROOT" />
     </logger>
-    
-	<root level="WARN">
+
+	<root level="DEBUG">
 		<appender-ref ref="WEBX-ROOT" />
 	</root>
 </configuration>

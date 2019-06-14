@@ -106,16 +106,6 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
-		<repository>
-			<id>weidai-releases</id>
-			<name>Releases</name>
-			<url>http://maven.weidai.work/nexus/content/repositories/releases/</url>
-		</repository>
-		<repository>
-			<id>weidai-snapshots</id>
-			<name>Snapshots</name>
-			<url>http://maven.weidai.work/nexus/content/repositories/snapshots/</url>
-		</repository>
 	</repositories>
 
 	<properties>
@@ -129,7 +119,7 @@
 		<file_encoding>UTF-8</file_encoding>
 		<spring-version>3.1.2.RELEASE</spring-version>
 		<jetty_verion>8.1.7.v20120910</jetty_verion>
-		<otter_canal_version>1.0.26-SNAPSHOT</otter_canal_version>
+		<otter_canal_version>1.1.2</otter_canal_version>
 	</properties>
 
 	<modules>

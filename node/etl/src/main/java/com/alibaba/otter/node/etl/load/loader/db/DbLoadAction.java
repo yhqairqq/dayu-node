@@ -83,7 +83,7 @@ import com.alibaba.otter.shared.etl.model.RowBatch;
 
 /**
  * 数据库load的执行入口
- * 
+ *
  * @author jianghang 2011-10-31 下午03:17:43
  * @version 4.0.0
  */
@@ -187,7 +187,7 @@ public class DbLoadAction implements InitializingBean, DisposableBean {
 
     /**
      * 分析整个数据，将datas划分为多个批次. ddl sql前的DML并发执行，然后串行执行ddl后，再并发执行DML
-     * 
+     *
      * @return
      */
     private boolean isDdlDatas(List<EventData> eventDatas) {
@@ -343,7 +343,7 @@ public class DbLoadAction implements InitializingBean, DisposableBean {
 
     /**
      * 执行ddl的调用，处理逻辑比较简单: 串行调用
-     * 
+     *
      * @param context
      * @param eventDatas
      */
@@ -589,11 +589,9 @@ public class DbLoadAction implements InitializingBean, DisposableBean {
                                         interceptor.transactionBegin(context, splitDatas, dbDialect);
                                         JdbcTemplate template = dbDialect.getJdbcTemplate();
                                         int[] affects = template.batchUpdate(sql, new BatchPreparedStatementSetter() {
-
                                             public void setValues(PreparedStatement ps, int idx) throws SQLException {
                                                 doPreparedStatement(ps, dbDialect, lobCreator, splitDatas.get(idx));
                                             }
-
                                             public int getBatchSize() {
                                                 return splitDatas.size();
                                             }
