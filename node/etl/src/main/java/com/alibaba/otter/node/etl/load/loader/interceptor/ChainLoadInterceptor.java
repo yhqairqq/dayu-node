@@ -21,6 +21,8 @@ import java.util.List;
 
 import com.alibaba.otter.node.etl.common.db.dialect.DbDialect;
 import com.alibaba.otter.node.etl.load.loader.LoadContext;
+import com.alibaba.otter.node.etl.load.loader.db.interceptor.sql.SqlBuilderLoadInterceptor;
+import com.alibaba.otter.node.etl.load.loader.mq.context.MqLoadContext;
 import com.alibaba.otter.shared.etl.model.ObjectData;
 
 public class ChainLoadInterceptor extends AbstractLoadInterceptor<LoadContext, ObjectData> {
@@ -44,6 +46,10 @@ public class ChainLoadInterceptor extends AbstractLoadInterceptor<LoadContext, O
 
         boolean result = false;
         for (LoadInterceptor interceptor : interceptors) {
+            //如果是mq不需要sql拦截器
+            if(context instanceof MqLoadContext){
+                continue;
+            }
             result |= interceptor.before(context, currentData);
             if (result) {// 出现一个true就退出
                 return result;

@@ -282,6 +282,7 @@ public class DataMediaServiceImpl implements DataMediaService {
         DataMediaDO dataMediaDo = new DataMediaDO();
 
         try {
+
             dataMediaDo.setId(dataMedia.getId());
             dataMediaDo.setName(dataMedia.getName());
             dataMediaDo.setNamespace(dataMedia.getNamespace());
@@ -289,6 +290,7 @@ public class DataMediaServiceImpl implements DataMediaService {
             // if (dataMedia instanceof DbDataMedia) {
             // dataMediaDo.setProperties(JsonUtils.marshalToString((DbDataMedia) dataMedia));
             // }
+            dataMediaDo.setTopic(dataMedia.getTopic());
             dataMediaDo.setProperties(JsonUtils.marshalToString(dataMedia));
             dataMediaDo.setGmtCreate(dataMedia.getGmtCreate());
             dataMediaDo.setGmtModified(dataMedia.getGmtModified());
@@ -313,7 +315,7 @@ public class DataMediaServiceImpl implements DataMediaService {
             if (dataMediaSource.getType().isMysql() || dataMediaSource.getType().isOracle()) {
                 dataMedia = JsonUtils.unmarshalFromString(dataMediaDo.getProperties(), DbDataMedia.class);
                 dataMedia.setSource(dataMediaSource);
-            } else if (dataMediaSource.getType().isNapoli() || dataMediaSource.getType().isMq()) {
+            } else if (dataMediaSource.getType().isNapoli() || dataMediaSource.getType().isKafka() || dataMediaSource.getType().isRocketMq()) {
                 dataMedia = JsonUtils.unmarshalFromString(dataMediaDo.getProperties(), MqDataMedia.class);
                 dataMedia.setSource(dataMediaSource);
             }

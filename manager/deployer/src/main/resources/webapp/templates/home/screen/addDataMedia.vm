@@ -37,7 +37,7 @@ function changeKeyword(id, name) {
             <span class="red">#addDataMediaMessage ($dataMediaGroup.formDataMediaError)</span>
         </tr>
       <tr> 
-        <th width="300">schmea name：</th>
+        <th width="300">schema name：</th>
         <td width="329">
 			<input id="namespace" name="$dataMediaGroup.namespace.key" value="$!dataMediaGroup.namespace.value" type="text" class="setting_input"/><span class="red">*</span>
 			<br />
@@ -47,11 +47,21 @@ function changeKeyword(id, name) {
 	  <tr> 
         <th width="300">table name：</th>
         <td width="329">
-			<input id="name" name="$dataMediaGroup.name.key" value="$!dataMediaGroup.name.value" type="text" class="setting_input"/><span class="red">*</span>
+##			<input id="name" name="$dataMediaGroup.name.key" value="$!dataMediaGroup.name.value" type="text" class="setting_input"/><span class="red">*</span>
+    <textarea id="name" cols="45" rows="5" name="$dataMediaGroup.name.key">$!dataMediaGroup.name.value</textarea><span class="red">*</span>
 			<br />
 			<span class="red">#addDataMediaMessage ($dataMediaGroup.name)</span>
 		</td>
       </tr>
+        <tr>
+            <th width="300">topic name：</th>
+            <td width="329">
+                <input id="topic" name="$dataMediaGroup.topic.key" value="$!dataMediaGroup.topic.value" type="text" class="setting_input"/><span class="red">*</span>
+                <br />
+                <span class="red">#addDataMediaMessage ($dataMediaGroup.topic)</span>
+            </td>
+        </tr>
+
 	  <tr> 
         <th>数据源：</th>
         <td>
@@ -65,6 +75,7 @@ function changeKeyword(id, name) {
 	  <tr> 
         <th><input type='button' value='验证连接表' onclick='checkMap();' /><br><hr align="right" style="width:100px;">
             <input type='button' value='查询Schema&Table' onclick='checkNamespaceTables()' />
+            <input type="button" value="表主键验证" onclick="checkTablesPrimaryKey()" />
 		</th>
         <td>
 			<span class="red" id="result"></span>
@@ -75,7 +86,9 @@ function changeKeyword(id, name) {
         <td>
 			<br/>
 			单表配置: alibaba.product<br/>
-			分表配置: alibaba[1-64].product , alibaba.product[01-32]<br/>
+			分表配置: alibaba[1-64].product , alibaba.product[01-32]
+            <br/>
+            多表的形式:table1;table2;table3; <br/>
 			正则配置: (.*).(.*)<br/>
 		</td>
       </tr>

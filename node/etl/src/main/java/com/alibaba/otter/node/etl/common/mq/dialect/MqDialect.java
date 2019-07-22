@@ -13,7 +13,7 @@ public interface MqDialect<Producer> {
 
     Producer getProducer();
 
-    String getTopic();
+    void destory();
 
 
 }

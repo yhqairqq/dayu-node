@@ -1,0 +1,113 @@
+程序连接地址
+rm-bp1kj1c39uy6090w5.mysql.rds.aliyuncs.com:3306
+10.111.18.49
+用ide连接
+10.111.14.140:3315
+otter/Qs94Q4SGljq0quOs
+10.111.7.153
+8088
+re_write   IXAaaWWiZhn1Nces
+mysql -h10.111.14.140 -P3307 -ure_write -pIXAaaWWiZhn1Nces
+ako.dailuobo.com
+
+zk:cloud01-bigdata-zk-vip00:2560
+bin/zkCli.sh -server cloud01-bigdata-zk-vip00:2560
+
+测试zkCli
+10.111.31.239:2560
+bin/zkCli.sh -server 10.111.31.239:2560
+
+10.111.23.0:2560
+10.111.18.35:2560
+10.111.18.36:2560
+
+/data/logs  日志
+/data/server/otter  文件
+
+
+<uris:uri id="server">
+    <serverURI>http://${otter.domainName}:${otter.port}/</serverURI>
+   </uris:uri>
+
+<uris:uri id="server">
+        <serverURI>http://${otter.domainName}/</serverURI>
+</uris:uri>
+
+       this.mysqlConnection = this.socketFactory.connect(this.host, this.port, props);创建连接的时候会用
+        InetAddress[] possibleAddresses = InetAddress.getAllByName(this.host);
+        获取IP地址
+
+临时 导出：
+sync  NuhEL2@p90BT
+
+delete /otter/canal/destinations/canal_aky2/2/cursor
+数据源信息
+单库配置： 10.20.144.34:3306;
+多库合并配置： 10.20.144.34:3306,10.20.144.35:3306; (逗号分隔)
+主备库配置：10.20.144.34:3306;10.20.144.34:3307; (分号分隔)
+caicai1
+mysql -hdb-prod00-caicai-1 -usync -pNuhEL2@p90BT
+备库
+
+mysql -hdb-prod00-caicai-2 -usync -pNuhEL2@p90BT
+汇总
+mysql -hdb-prod-caicai-mg -usync -pNuhEL2@p90BT
+
+
+caicai 备份
+mysql -hdb-prod01-caicai-1 -usync -pNuhEL2@p90BT
+
+erp
+db-prod-erp-1    erp_admin  xuc8dHr#s^4N7O
+mysql -hdb-prod-erp-1 -uerp_admin -pxuc8dHr#s^4N7O
+
+汇总表表结构修改:
+rm-bp14iswqq0426jf3f.mysql.rds.aliyuncs.com
+修改表结构
+mysql -hmysql -hrm-bp14iswqq0426jf3f.mysql.rds.aliyuncs.com -usync -pNuhEL2@p90BT
+http://10.111.27.2:8082/#/  mq   10.111.27.2:9876 broker 地址
+
+managermq
+akomq.caicaivip.com
+10.111.43.235:2560
+otter.database.driver.url = jdbc:mysql://rm-bp1kj1c39uy6090w5.mysql.rds.aliyuncs.com:3306/ottermq
+otter.database.driver.username = ottermq
+otter.database.driver.password = 08R4yj8r1Tr1NOIR
+3d987ee2243744c714071d9b7c62f808d8e944051f770fd2631e782ae9d2a994
+
+预测库
+ PROPERTIES: {"driver":"com.mysql.jdbc.Driver","encode":"UTF8","id":3,"name":"预售预测汇总","password":"predict@ADMIN123","type":"MYSQL","url":"jdbc:mysql://rm-bp12s3t224vrom2hp.mysql.rds.aliyuncs.com:3306","username":"predict"}
+
+
+ rm-bp12s3t224vrom2hp.mysql.rds.aliyuncs.com
+ db_admin ux49jX4hWMs9
+
+
+mq集群的元数据连接
+mysql -hrm-bp1kj1c39uy6090w5.mysql.rds.aliyuncs.com -uottermq -p08R4yj8r1Tr1NOIR
+db集群元数据连接
+mysql -hrm-bp1kj1c39uy6090w5.mysql.rds.aliyuncs.com -uotter -pQs94Q4SGljq0quOs
+
+分成测试caicai
+mysql -hrm-bp10p2vl5x3c4mum5160.mysql.rds.aliyuncs.com -ucaicai_dev -p123!@#qwe
+
+
+
+现在我们要把菜菜的数据同步出来一份，global：数据库地址：rm-bp10p2vl5x3c4mum5160.mysql.rds.aliyuncs.com
+数据库|用户名|密码：caicai_alpha_global  alpha_global 3i5YK&360Fu0PuDq
+
+源库：数据库地址rm-bp10p2vl5x3c4mum5160.mysql.rds.aliyuncs.com
+数据库|用户名|密码：caicai caicai 123!@#qwe      全量同步，包括所有表
+
+mysql -hrm-bp10p2vl5x3c4mum5160.mysql.rds.aliyuncs.com -ualpha_global -p'3i5YK&360Fu0PuDq'
+
+mysql -hrm-bp10p2vl5x3c4mum5160.mysql.rds.aliyuncs.com -ucaicai -p'123!@#qwe'    //总
+
+mysql -hrm-bp1e079ew20s5t566.mysql.rds.aliyuncs.com -ucaicai -p'a0B!98#$'   //拆城
+
+
+global：数据库地址：rm-bp10p2vl5x3c4mum5160.mysql.rds.aliyuncs.com
+数据库|用户名|密码：caicai_alpha_global  alpha_global 3i5YK&360Fu0PuDq
+
+源库：数据库地址rm-bp10p2vl5x3c4mum5160.mysql.rds.aliyuncs.com
+数据库|用户名|密码：caicai caicai 123!@#qwe      全量同步，包括所有表

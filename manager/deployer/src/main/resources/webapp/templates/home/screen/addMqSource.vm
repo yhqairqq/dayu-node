@@ -39,8 +39,8 @@ $control.setTemplate("home:navigation.vm")
         <th>类型：</th>
         <td>
             <select id="sourceType" name="$dataMediaSourceGroup.type.key" onchange="changeform();" >
-            <option value="ORACLE">Oracle</option>
-                <option value="MQ">MQ</option>
+            <option value="KAFKA">KAFKA</option>
+            <option value="ROCKETMQ">ROCKETMQ</option>
 			</select><span class="red">*</span>
         </td>
       </tr>
@@ -52,6 +52,30 @@ $control.setTemplate("home:navigation.vm")
 			<span class="red">#addDataSourceMessage ($dataMediaSourceGroup.url)</span>
 		</td>
       </tr>
+        <tr>
+            <th>RocketMq Producer GroupName</th>
+            <td>
+                <input id="rocketProducerGroupName" name="$dataMediaSourceGroup.groupName.key" value="$!dataMediaSourceGroup.groupName.value" type="text" class="setting_input"/>
+                <br />
+                <span class="red">#addDataSourceMessage ($dataMediaSourceGroup.groupName)</span>
+            </td>
+        </tr>
+        <tr>
+            <th>RocketMq Producer InstanceName</th>
+            <td>
+                <input id="rocketProducerGroupName" name="$dataMediaSourceGroup.instanceName.key" value="$!dataMediaSourceGroup.instanceName.value" type="text" class="setting_input"/>
+                <br />
+                <span class="red">#addDataSourceMessage ($dataMediaSourceGroup.instanceName)</span>
+            </td>
+        </tr>
+##        <tr>
+##            <th>topic：</th>
+##            <td>
+##                <input id="topic" name="$dataMediaSourceGroup.topic" value="$!dataMediaSourceGroup.topic.value" type="text" class="setting_input"/>
+##                <br />
+##                <span class="red">#addDataSourceMessage ($dataMediaSourceGroup.url)</span>
+##            </td>
+##        </tr>
 	  #**
 	  <tr> 
         <th>StorePath：</th>
@@ -62,17 +86,24 @@ $control.setTemplate("home:navigation.vm")
 		</td>
       </tr>
 	  *#
-	  <tr> 
-        <th>编码：</th>
-        <td>
-			<select id="sourceEncode" name="$dataMediaSourceGroup.encode.key"  style="width:200px;" > 
-				<option value="GBK" #if($!dataMediaSourceGroup.encode.value == 'GBK') selected  #end>GBK</option>
-				<option value="UTF8" #if($!dataMediaSourceGroup.encode.value == 'UTF8') selected  #end>UTF8</option>
-				<option value="UTF8MB4" #if($!dataMediaSourceGroup.encode.value == 'UTF8MB4') selected  #end>UTF8MB4</option>
-				<option value="ISO-8859-1" #if($!dataMediaSourceGroup.encode.value == 'ISO-8859-1') selected  #end>ISO-8859-1</option>
-            </select><span class="red">*</span>
-		</td>
-      </tr>
+##	  <tr>
+##        <th>编码：</th>
+##        <td>
+##			<select id="sourceEncode" name="$dataMediaSourceGroup.encode.key"  style="width:200px;" >
+##				<option value="GBK" #if($!dataMediaSourceGroup.encode.value == 'GBK') selected  #end>GBK</option>
+##				<option value="UTF8" #if($!dataMediaSourceGroup.encode.value == 'UTF8') selected  #end>UTF8</option>
+##				<option value="UTF8MB4" #if($!dataMediaSourceGroup.encode.value == 'UTF8MB4') selected  #end>UTF8MB4</option>
+##				<option value="ISO-8859-1" #if($!dataMediaSourceGroup.encode.value == 'ISO-8859-1') selected  #end>ISO-8859-1</option>
+##            </select><span class="red">*</span>
+##		</td>
+##      </tr>
+
+        <tr>
+            <th><input type='button' value='验证连接数据源' onclick='check();' /></th>
+            <td>
+                <span class="red" id="result"></span>
+            </td>
+        </tr>
     <tr>
         <th>url示例说明</th>
         <td>

@@ -129,8 +129,10 @@ public class DataBatchLoader implements OtterLoader<DbBatch, List<LoadContext>>,
                 if (future.isDone()) {
                     try {
                         LoadContext loadContext = (LoadContext) future.get();
-
-                        if (loadContext instanceof DbLoadContext) {
+                        if(loadContext instanceof MqLoadContext){
+                            dbInterceptor.error((MqLoadContext) loadContext);// 做一下出错处理，记录到store中
+                        }
+                        if (loadContext instanceof DbLoadContext ) {
                             dbInterceptor.error((DbLoadContext) loadContext);// 做一下出错处理，记录到store中
                         }
                     } catch (InterruptedException e) {
@@ -150,7 +152,9 @@ public class DataBatchLoader implements OtterLoader<DbBatch, List<LoadContext>>,
                 Future future = futures.get(i);
                 try {
                     LoadContext loadContext = (LoadContext) future.get();
-
+                    if(loadContext instanceof MqLoadContext){
+                        processedContexts.add((MqLoadContext) loadContext);
+                    }
                     if (loadContext instanceof DbLoadContext) {
                         processedContexts.add((DbLoadContext) loadContext);
                     }
@@ -218,11 +222,7 @@ public class DataBatchLoader implements OtterLoader<DbBatch, List<LoadContext>>,
                             DbLoadAction dbLoadAction = beanFactory.getBean("dbLoadAction",
                                     DbLoadAction.class);
                             return dbLoadAction.load(rowBatch, controller);
-
                         }
-
-
-
                     } finally {
                         MDC.remove(OtterConstants.splitPipelineLogFileKey);
                     }

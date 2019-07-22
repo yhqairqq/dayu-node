@@ -1,0 +1,108 @@
+$control.setTemplate("home:navigation.vm")
+<script type='text/javascript' src='dwr/interface/Hello.js'></script>  
+<script type='text/javascript' src='dwr/engine.js'></script>  
+<script type='text/javascript' src='dwr/util.js'></script>  
+<script type='text/javascript' src='js/dbCheck.js'></script>
+<script language="javascript">
+<!--
+	changeNav("datamedia");
+//-->
+</script>
+#macro (editDataSourceMessage $field)
+    #if (!$field.valid) $field.message #end
+#end
+
+<div class="main">
+  <div class="title"> 
+    <h2>编辑数据源</h2>
+  </div>
+  <div class="crumbs"><a href="dataSourceList.htm">数据源配置</a>&nbsp;&nbsp;>&nbsp;&nbsp;<a href="editDataSource.htm?dataMediaSourceId=$source.id">编辑数据源</a></div>
+ 
+ <form name="editMqSourceForm" method="post" enctype="multipart/form-data">
+ $csrfToken.hiddenField
+	<input type="hidden" name="action" value="data_media_source_action"/>
+	<input type="hidden" name="event_submit_do_edit" value="1" />
+	<input type="hidden" id="pageIndex" name="pageIndex" value="$!pageIndex"/>
+	<input type="hidden" id="searchKey" name="searchKey" value="$!searchKey"/>
+ <div class="setting_box">
+	#set ($dataMediaSourceGroup = $form.dataMediaSourceInfo.defaultInstance)
+	<input type="hidden" name="$dataMediaSourceGroup.id.key" value="$source.id" />
+    <input type="hidden" name="dataMediaSourceId" value="$source.id" />
+	<table cellpadding="0" cellspacing="0" class="setting_otter">
+        <span class="red">#editDataSourceMessage ($dataMediaSourceGroup.formDataMediaSourceError)</span>
+      <tr> 
+        <th width="300">Mq源名字：</th>
+        <td width="329">
+			<input name="$dataMediaSourceGroup.name.key" type="text" value="$source.name" class="setting_input"/><span class="red">*</span>
+			<br />
+			<span class="red">#editDataSourceMessage ($dataMediaSourceGroup.name)</span>
+		</td>
+      </tr>
+
+        <tr>
+            <th>类型：</th>
+            <td>
+                <select id="sourceType" name="$dataMediaSourceGroup.type.key" onchange="changeform();" >
+                    <option value="KAFKA" #if($source.type.isKafka()) selected="selected" #end>KAFKA</option>
+                    <option value="ROCKETMQ" #if($source.type.isRocketMq()) selected="selected" #end>ROCKETMQ</option>
+                </select><span class="red">*</span>
+            </td>
+        </tr>
+
+	  <tr> 
+        <th>URL：</th>
+        <td>
+			<input id="sourceUrl" name="$dataMediaSourceGroup.url.key" value="$source.url" type="text" class="setting_input"/><span class="red">*</span>
+			<br />
+			<span class="red">#editDataSourceMessage ($dataMediaSourceGroup.url)</span>
+		</td>
+      </tr>
+
+        <tr>
+            <th>RocketMq Producer GroupName：</th>
+            <td>
+                <input id="sourceUrl" name="$dataMediaSourceGroup.groupName.key" value="$!source.groupName" type="text" class="setting_input"/><span class="red">*</span>
+                <br />
+                <span class="red">#editDataSourceMessage ($dataMediaSourceGroup.groupName)</span>
+            </td>
+        </tr>
+
+
+        <tr>
+            <th>RocketMq Producer InstanceName：</th>
+            <td>
+                <input id="sourceUrl" name="$dataMediaSourceGroup.instanceName.key" value="$!source.instanceName" type="text" class="setting_input"/><span class="red">*</span>
+                <br />
+                <span class="red">#editDataSourceMessage ($dataMediaSourceGroup.instanceName)</span>
+            </td>
+        </tr>
+	  #**
+	   <tr> 
+        <th>StorePath：</th>
+        <td>
+			<input id="sourceStorePath" name="$dataMediaSourceGroup.storePath.key" value="$!source.storePath" type="text" class="setting_input"/><span class="red">Napoli</span>
+			<br />
+			<span class="red">#editDataSourceMessage ($dataMediaSourceGroup.storePath)</span>
+		</td>
+      </tr>
+	  *#
+
+	  <tr> 
+        <th><input type='button' value='验证连接数据源' onclick='check();' /></th>
+        <td>
+			<span class="red" id="result"></span>
+		</td>
+      </tr>
+        <tr>
+            <th>url示例说明</th>
+            <td>
+                kafka例子: 172.20.100.183:9092,172.20.100.185:9092,172.20.100.186:9092<br/>
+                RocketMq例子 : rkmq1.wd.com:9876;rkmq2.wd.com:9876<br/>
+            </td>
+        </tr>
+      
+    </table>
+ </div>
+  <div class="btn"><a href="javascript:document.editMqSourceForm.submit();">保存</a></div>
+ </form>
+</div>

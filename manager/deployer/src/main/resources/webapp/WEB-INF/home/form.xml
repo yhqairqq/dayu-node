@@ -185,6 +185,7 @@
 			<field name="fileDetect" displayName="是否开启文件重复同步对比" />
 			<field name="pipeChooseType" displayName="传输模式" />
 			<field name="useTableTransform" displayName="表类型转化" />
+			<field name="passChange" displayName="传递变化" />
 			<field name="enableCompatibleMissColumn"
 				displayName="兼容字段新增同步" />
 			<field name="skipNoRow" displayName="忽略反查无记录" />
@@ -221,6 +222,10 @@
 			</field>
 		</group>
 
+
+
+
+
 		<!-- - ======== - 数据库的 dataMediaSource - ======== -->
 		<group name="dataMediaSourceInfo" extends="csrfCheck">
 			<field name="formDataMediaSourceError">
@@ -245,11 +250,11 @@
 					<message>必须填写${displayName}</message>
 				</fm-validators:required-validator>
 			</field>
+
 			<field name="encode" displayName="数据库编码">
-				<fm-validators:required-validator>
-					<message>必须选择${displayName}</message>
-				</fm-validators:required-validator>
 			</field>
+			<field name="groupName" displayName="ROCKETMQ PRODUCER GROUPNAME" />
+			<field name="instanceName" displayName="ROCKETMQ PRODUCER INSTANCENAME" />
 		</group>
 
 		<!-- - ======== - 字段映射 - ======== -->
@@ -288,9 +293,7 @@
 			<field name="id" displayName="dataMedia的id" />
 			<field name="name" displayName="名称" />
 			<field name="namespace" displayName="命名空间">
-				<fm-validators:required-validator>
-					<message>必须填写 ${displayName}</message>
-				</fm-validators:required-validator>
+
 			</field>
 			<field name="encode" displayName="数据编码" />
 			<field name="sourceName" displayName="数据源名称" />
@@ -299,6 +302,7 @@
 					<message>必须选择一个 ${displayName}</message>
 				</fm-validators:required-validator>
 			</field>
+			<field name="topic" displayName="topic"/>
 		</group>
 
 		<!-- - ======== - zookeeperCluster info - ======== -->
@@ -838,6 +842,16 @@
 				</fm-validators:required-validator>
 			</field>
 
+			<field name="tsdbEnable" displayName="是否开启表结构tsdb">
+				<fm-validators:required-validator>
+					<message>必须填写${displayName}</message>
+				</fm-validators:required-validator>
+			</field>
+			<field name="gtidEnable" displayName="是否启用gtid位点">
+				<fm-validators:required-validator>
+					<message>必须填写${displayName}</message>
+				</fm-validators:required-validator>
+			</field>
 			<field name="detectingEnable" displayName="是否开启心跳">
 				<fm-validators:required-validator>
 					<message>必须填写${displayName}</message>
@@ -909,6 +923,9 @@
 				</fm-validators:required-validator>
 			</field>
 			<field name="blackFilter" displayName="过滤表达式"/>
+			<field name="rdsAccesskey" displayName="rds accesskey" />
+			<field name="rdsSecretkey" displayName="rds secretkey" />
+			<field name="rdsInstanceId" displayName="rds instance" />
 		</group>
 
 		<group name="dataMatrixInfo" extends="csrfCheck">

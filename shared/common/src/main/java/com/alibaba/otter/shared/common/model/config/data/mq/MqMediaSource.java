@@ -28,7 +28,8 @@ public class MqMediaSource extends DataMediaSource {
 
     private static final long serialVersionUID = -1699317916850638142L;
     private String            url;
-    private String            storePath;
+    private String            groupName;
+    private String            instanceName;
 
     public String getUrl() {
         return url;
@@ -38,12 +39,19 @@ public class MqMediaSource extends DataMediaSource {
         this.url = url;
     }
 
-    public String getStorePath() {
-        return storePath;
+    public String getGroupName() {
+        return groupName;
     }
 
-    public void setStorePath(String storePath) {
-        this.storePath = storePath;
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
+    public String getInstanceName() {
+        return instanceName;
+    }
+
+    public void setInstanceName(String instanceName) {
+        this.instanceName = instanceName;
+    }
 }

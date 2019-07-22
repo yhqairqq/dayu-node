@@ -20,21 +20,21 @@ public class HintEventProcessor extends AbstractEventProcessor {
         String fixId = "";
         for(EventColumn eventColumn:eventColumns ){
             if(eventColumn.getColumnName().equals("catlog")){
-                fixId  = fixId + (int)((Math.random()*9+1)*1000);
+                fixId  = fixId + eventColumn.getColumnValue();
             }
         }
         if(eventData.getEventType() == EventType.INSERT){
-                if(keys.size() == 1){
-                    String key =  keys.get(0).getColumnValue();
-                    keys.get(0).setColumnValue(key+fixId);
-                }
+            if(keys.size() == 1){
+                String key =  keys.get(0).getColumnValue();
+                keys.get(0).setColumnValue(key+fixId);
+            }
         }else if(eventData.getEventType() == EventType.UPDATE){
             if(updateKeys.size() == 1){
                 String key =  updateKeys.get(0).getColumnValue();
                 updateKeys.get(0).setColumnValue(key+fixId);
             }
         }
-        System.out.println(eventData);
+
         return true;
     }
 }

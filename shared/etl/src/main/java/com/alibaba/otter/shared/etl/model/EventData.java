@@ -19,7 +19,9 @@ package com.alibaba.otter.shared.etl.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import com.alibaba.otter.shared.common.model.config.data.Column;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
 import com.alibaba.otter.shared.common.model.config.channel.ChannelParameter.SyncConsistency;
@@ -115,6 +117,54 @@ public class EventData implements ObjectData, Serializable {
      * 生成sql是否忽略schema,比如针对tddl/drds,需要忽略schema
      */
     private boolean           withoutSchema    = false;
+
+
+    /**
+     * 主题
+     * @return
+     */
+    private String topic;
+
+    /**
+     * 分片或者tag
+     * @return
+     */
+    private String partitionTag;
+
+    private Map<String,String> before;
+    private Map<String,String> after;
+
+    public Map<String, String> getBefore() {
+        return before;
+    }
+
+    public void setBefore(Map<String, String> before) {
+        this.before = before;
+    }
+
+    public Map<String, String> getAfter() {
+        return after;
+    }
+
+    public void setAfter(Map<String, String> after) {
+        this.after = after;
+    }
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
+
+    public String getPartitionTag() {
+        return partitionTag;
+    }
+
+    public void setPartitionTag(String partitionTag) {
+        this.partitionTag = partitionTag;
+    }
 
     public long getTableId() {
         return tableId;

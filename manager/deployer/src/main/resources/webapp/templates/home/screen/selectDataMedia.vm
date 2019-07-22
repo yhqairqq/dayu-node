@@ -46,6 +46,7 @@ $control.setTemplate("home:navigation.vm")
       <th>序号</th>
 	  <th>Schema Name</th>
 	  <th>Table Name</th>
+
 	  <th>数据源</th>
 	  <th>操作</th>
     </tr>
@@ -55,6 +56,7 @@ $control.setTemplate("home:navigation.vm")
       <td width="10%">$!dataMedia.id</td>
 	  <td width="20%">$!dataMedia.namespace</td>
       <td width="20%">$!dataMedia.name</td>
+
       <td>
 		#set ($dataSourceInfoURL = $homeModule.setTarget("dataSourceInfo.vm").addQueryData("dataMediaSourceId", $!dataMedia.source.id))
 		<a href="$dataSourceInfoURL">$!dataMedia.source.name</a>

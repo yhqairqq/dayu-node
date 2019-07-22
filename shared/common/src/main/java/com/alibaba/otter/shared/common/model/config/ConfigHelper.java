@@ -42,26 +42,27 @@ import com.google.common.collect.OtterMigrateMap;
 
 /**
  * 常用的config处理帮助类
- * 
+ *
  * @author jianghang 2011-10-20 下午05:28:39
  * @version 4.0.0
  */
 public class ConfigHelper {
 
-    public static final String          MODE_PATTERN = "(.*)(\\[(\\d+)\\-(\\d+)\\])(.*)"; // 匹配offer[1-128]
-    private static Map<String, Pattern> patterns     = OtterMigrateMap.makeComputingMap(new Function<String, Pattern>() {
+    public static final String MODE_PATTERN = "(.*)(\\[(\\d+)\\-(\\d+)\\])(.*)"; // 匹配offer[1-128]
+    public static final String MODE_PATTERN_MULTItABLE = "(.*)(\\[(.*\\,)])(.*)";
+    private static Map<String, Pattern> patterns = OtterMigrateMap.makeComputingMap(new Function<String, Pattern>() {
 
-                                                         public Pattern apply(String input) {
-                                                             PatternCompiler pc = new Perl5Compiler();
-                                                             try {
-                                                                 return pc.compile(input,
-                                                                     Perl5Compiler.CASE_INSENSITIVE_MASK
-                                                                             | Perl5Compiler.READ_ONLY_MASK);
-                                                             } catch (MalformedPatternException e) {
-                                                                 throw new ConfigException(e);
-                                                             }
-                                                         }
-                                                     });
+        public Pattern apply(String input) {
+            PatternCompiler pc = new Perl5Compiler();
+            try {
+                return pc.compile(input,
+                        Perl5Compiler.CASE_INSENSITIVE_MASK
+                                | Perl5Compiler.READ_ONLY_MASK);
+            } catch (MalformedPatternException e) {
+                throw new ConfigException(e);
+            }
+        }
+    });
 
     /**
      * 根据DataMedia id得到对应的DataMedia
@@ -166,7 +167,8 @@ public class ConfigHelper {
      */
     public static ModeValue parseMode(String value) {
         PatternMatcher matcher = new Perl5Matcher();
-        if (matcher.matches(value, patterns.get(MODE_PATTERN))) {
+        String subStrings[] = value.split(";");
+        if (matcher.matches(value, patterns.get(MODE_PATTERN)) ) {
             MatchResult matchResult = matcher.getMatch();
             String prefix = matchResult.group(1);
             String startStr = matchResult.group(3);
@@ -188,7 +190,13 @@ public class ConfigHelper {
                 values.add(builder.toString());
             }
             return new ModeValue(Mode.MULTI, values);
-        } else if (isWildCard(value)) {// 通配符支持
+        }else if(subStrings != null && subStrings.length > 1){
+            List<String> values = new ArrayList<String>();
+            for(String name:subStrings){
+                values.add(name.trim());
+            }
+            return new ModeValue(Mode.MULTI, values);
+        }else if (isWildCard(value)) {// 通配符支持
             return new ModeValue(Mode.WILDCARD, Arrays.asList(value));
         } else {
             return new ModeValue(Mode.SINGLE, Arrays.asList(value));
@@ -208,7 +216,8 @@ public class ConfigHelper {
             return StringUtils.substringBefore(rawValue, "[") + "%";
         } else if (mode.getMode().isWildCard()) {
             StringBuilder sb = new StringBuilder(rawValue.length());
-            FOR_LOOP: for (int i = 0; i < rawValue.length(); i++) {
+            FOR_LOOP:
+            for (int i = 0; i < rawValue.length(); i++) {
                 String charString = String.valueOf(rawValue.charAt(i));
                 if (isWildCard(charString)) {
                     break FOR_LOOP;
@@ -290,8 +299,8 @@ public class ConfigHelper {
     }
 
     private static boolean isWildCard(String value) {
-        return StringUtils.containsAny(value, new char[] { '*', '?', '+', '|', '(', ')', '{', '}', '[', ']', '\\', '$',
-                '^', '.' });
+        return StringUtils.containsAny(value, new char[]{'*', '?', '+', '|', '(', ')', '{', '}', '[', ']', '\\', '$',
+                '^', '.'});
     }
 
     private static boolean isWildCardMatch(String matchPattern, String value) {
@@ -309,6 +318,30 @@ public class ConfigHelper {
         }
 
         return -1;
+    }
+
+
+    public static void main(String[] args) {
+        String pattern = "([^;]+;)";
+        PatternCompiler pc = new Perl5Compiler();
+
+        try {
+            Pattern pattern1 = pc.compile(pattern,
+                    Perl5Compiler.CASE_INSENSITIVE_MASK
+                            | Perl5Compiler.READ_ONLY_MASK);
+
+            PatternMatcher matcher = new Perl5Matcher();
+            String value = "meta_table_config1;meta_table_config2;meta_table_config3;";
+            if (matcher.matches(value, pattern1)) {
+                MatchResult matchResult = matcher.getMatch();
+                System.out.println(matchResult);
+//            return new ModeValue(Mode.MULTI, values);
+            }
+        } catch (MalformedPatternException e) {
+            throw new ConfigException(e);
+        }
+
+
     }
 
 }

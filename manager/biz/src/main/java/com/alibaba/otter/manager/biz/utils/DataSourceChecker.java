@@ -16,10 +16,7 @@
 
 package com.alibaba.otter.manager.biz.utils;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.ddlutils.model.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.alibaba.otter.manager.biz.common.DataSourceCreator;
@@ -44,6 +42,8 @@ import com.alibaba.otter.shared.common.model.config.data.db.DbMediaSource;
 import com.alibaba.otter.shared.common.utils.meta.DdlSchemaFilter;
 import com.alibaba.otter.shared.common.utils.meta.DdlTableNameFilter;
 import com.alibaba.otter.shared.common.utils.meta.DdlUtils;
+import org.springframework.jdbc.core.PreparedStatementCallback;
+import org.springframework.util.CollectionUtils;
 
 /**
  * @author simon 2011-11-25 下午04:57:55
@@ -53,6 +53,10 @@ public class DataSourceChecker {
     private static final Logger    logger             = LoggerFactory.getLogger(DataSourceChecker.class);
     private DataMediaSourceService dataMediaSourceService;
     private DataSourceCreator      dataSourceCreator;
+
+    private static final String CHECK_PRIMARY_KEY = "select count(1) from INFORMATION_SCHEMA.KEY_COLUMN_USAGE t where t.TABLE_SCHEMA = ? and t.TABLE_NAME = ? and t.CONSTRAINT_NAME = ?";
+
+    private static final String PRIMARY_KEY = "PRIMARY";
 
     // private static final String MYSQL_FLAG = "mysql";
 
@@ -226,22 +230,39 @@ public class DataSourceChecker {
             ModeValue nameValue = ConfigHelper.parseMode(name);
             String tempNamespace = namespaceValue.getSingleValue();
             String tempName = nameValue.getSingleValue();
-
+            if(nameValue.getMode().isMulti()){
+                List<String> names = nameValue.getMultiValue();
+                try {
+                    List<Table> tables = DdlUtils.findTables(new JdbcTemplate(dataSource), tempNamespace, tempNamespace, names);
+                    if (CollectionUtils.isEmpty(tables)) {
+                        return SELECT_FAIL;
+                    }
+                } catch (SQLException se) {
+                    logger.error("check error!", se);
+                    return SELECT_FAIL;
+                } catch (Exception e) {
+                    logger.error("check error!", e);
+                    return SELECT_FAIL;
+                }
+            }else if(nameValue.getMode().isSingle()){
+                 tempName = nameValue.getSingleValue();
+                try {
+                    Table table = DdlUtils.findTable(new JdbcTemplate(dataSource), tempNamespace, tempNamespace, tempName);
+                    if (table == null) {
+                        return SELECT_FAIL;
+                    }
+                } catch (SQLException se) {
+                    logger.error("check error!", se);
+                    return SELECT_FAIL;
+                } catch (Exception e) {
+                    logger.error("check error!", e);
+                    return SELECT_FAIL;
+                }
+            }
             // String descSql = "desc " + tempNamespace + "." + tempName;
             // stmt = conn.createStatement();
 
-            try {
-                Table table = DdlUtils.findTable(new JdbcTemplate(dataSource), tempNamespace, tempNamespace, tempName);
-                if (table == null) {
-                    return SELECT_FAIL;
-                }
-            } catch (SQLException se) {
-                logger.error("check error!", se);
-                return SELECT_FAIL;
-            } catch (Exception e) {
-                logger.error("check error!", e);
-                return SELECT_FAIL;
-            }
+
 
             // String selectSql = "SELECT * from " + tempNamespace + "." +
             // tempName + " where 1 = 0";
@@ -279,6 +300,64 @@ public class DataSourceChecker {
 
         return TABLE_SUCCESS;
 
+    }
+
+    /**
+     * 检车表是否具备主键
+     * @param namespace
+     * @param name
+     * @param dataSourceId
+     * @return
+     */
+    public String checkTablesPrimaryKey(final String namespace, final String name, final Long dataSourceId){
+        DataSource dataSource = null;
+        try{
+            DataMediaSource source = dataMediaSourceService.findById(dataSourceId);
+            DbMediaSource dbMediaSource = (DbMediaSource) source;
+            dataSource = dataSourceCreator.createDataSource(dbMediaSource);
+            JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+            ModeValue nameValue = ConfigHelper.parseMode(name);
+            List<String> schemaList;
+            {
+                ModeValue mode = ConfigHelper.parseMode(namespace);
+                String schemaPattern = ConfigHelper.makeSQLPattern(mode, namespace);
+                final ModeValueFilter modeValueFilter = ConfigHelper.makeModeValueFilter(mode, namespace);
+                if (source.getType().isOracle()) {
+                    schemaList = Arrays.asList(namespace);
+                } else {
+                    schemaList = DdlUtils.findSchemas(jdbcTemplate, schemaPattern, new DdlSchemaFilter() {
+
+                        @Override
+                        public boolean accept(String schemaName) {
+                            return modeValueFilter.accept(schemaName);
+                        }
+                    });
+                }
+            }
+            final List<String> matchSchemaTables = new ArrayList<String>();
+            matchSchemaTables.add("Find schema and tables no primary key:");
+            if(schemaList != null){
+                ModeValue mode = ConfigHelper.parseMode(name);
+                final ModeValueFilter modeValueFilter = ConfigHelper.makeModeValueFilter(mode, name);
+                for (String schema : schemaList) {
+                    for(String tableName:mode.getMultiValue()){
+                        int result =  jdbcTemplate.queryForInt(CHECK_PRIMARY_KEY,new Object[]{schema,tableName,PRIMARY_KEY});
+                        if(result < 1 ){
+                            matchSchemaTables.add(schema + "." + tableName);
+                        }
+                    }
+                }
+            }
+            if (matchSchemaTables.size() > 1) {
+                return StringUtils.join(matchSchemaTables, ",");
+            }
+            return TABLE_SUCCESS;
+        }catch (Exception e){
+            logger.error("check error!", e);
+            return TABLE_FAIL;
+        }finally {
+            dataSourceCreator.destroyDataSource(dataSource);
+        }
     }
 
     public String checkNamespaceTables(final String namespace, final String name, final Long dataSourceId) {

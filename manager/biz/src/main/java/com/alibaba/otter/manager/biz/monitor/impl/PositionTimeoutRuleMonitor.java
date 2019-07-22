@@ -32,7 +32,7 @@ import com.alibaba.otter.shared.common.model.config.pipeline.Pipeline;
 
 /**
  * 位点超时监控
- * 
+ *
  * @author jianghang 2012-12-12 上午10:33:12
  * @version 4.1.3
  */

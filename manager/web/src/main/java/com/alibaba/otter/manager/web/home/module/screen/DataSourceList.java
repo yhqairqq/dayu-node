@@ -76,7 +76,7 @@ public class DataSourceList {
                 seniorDataMediaSource.setUsername(((DbMediaSource) dataMediaSource).getUsername());
             } else if (dataMediaSource instanceof MqMediaSource) {
                 seniorDataMediaSource.setUrl(((MqMediaSource) dataMediaSource).getUrl());
-                seniorDataMediaSource.setStorePath(((MqMediaSource) dataMediaSource).getStorePath());
+//                seniorDataMediaSource.setStorePath(((MqMediaSource) dataMediaSource).getStorePath());
             }
             List<DataMedia> dataMedia = dataMediaService.listByDataMediaSourceId(dataMediaSource.getId());
             seniorDataMediaSource.setDataMedias(dataMedia);

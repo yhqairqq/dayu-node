@@ -62,10 +62,9 @@ public class DataMediaAction extends AbstractAction {
         DataMediaSource dataMediaSource = dataMediaSourceService.findById(dataMediaInfo.getField("sourceId").getLongValue());
         if (dataMediaSource.getType().isMysql() || dataMediaSource.getType().isOracle()) {
             dataMedia.setSource((DbMediaSource) dataMediaSource);
-        } else if (dataMediaSource.getType().isNapoli() || dataMediaSource.getType().isMq()) {
+        } else if (dataMediaSource.getType().isNapoli() || dataMediaSource.getType().isKafka() || dataMediaSource.getType().isRocketMq()) {
             dataMedia.setSource((MqMediaSource) dataMediaSource);
         }
-
         try {
             dataMediaService.create(dataMedia);
         } catch (RepeatConfigureException rce) {
@@ -97,7 +96,7 @@ public class DataMediaAction extends AbstractAction {
         DataMediaSource dataMediaSource = dataMediaSourceService.findById(dataMediaInfo.getField("sourceId").getLongValue());
         if (dataMediaSource.getType().isMysql() || dataMediaSource.getType().isOracle()) {
             dataMedia.setSource((DbMediaSource) dataMediaSource);
-        } else if (dataMediaSource.getType().isNapoli() || dataMediaSource.getType().isMq()) {
+        } else if (dataMediaSource.getType().isNapoli() || dataMediaSource.getType().isKafka() || dataMediaSource.getType().isRocketMq()) {
             dataMedia.setSource((MqMediaSource) dataMediaSource);
         }
 

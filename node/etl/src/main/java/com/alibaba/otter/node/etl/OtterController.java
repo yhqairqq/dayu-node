@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import com.alibaba.otter.node.etl.common.mq.dialect.MqDialectFactory;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +80,11 @@ public class OtterController implements NodeTaskListener, OtterControllerMBean {
     private NodeTaskService                       nodeTaskService;
     // 各种资源管理
     private DataSourceService                     dataSourceService;                                           // 连接池资源
-    private DbDialectFactory                      dbDialectFactory;                                            // 数据库信息资源
+    private DbDialectFactory                      dbDialectFactory;
+
+    private MqDialectFactory                      mqDialectFactory;
+
+            // 数据库信息资源
     private ArbitrateEventService                 arbitrateEventService;                                       // 仲裁器资源
     private ExecutorService                       executorService;
 
@@ -235,6 +240,8 @@ public class OtterController implements NodeTaskListener, OtterControllerMBean {
     private void releasePipeline(Long pipelineId) {
         dataSourceService.destroy(pipelineId);
         dbDialectFactory.destory(pipelineId);
+        mqDialectFactory.destory(pipelineId);
+
     }
 
     private void initNid() {
@@ -414,4 +421,8 @@ public class OtterController implements NodeTaskListener, OtterControllerMBean {
         this.executorService = executorService;
     }
 
+
+    public void setMqDialectFactory(MqDialectFactory mqDialectFactory) {
+        this.mqDialectFactory = mqDialectFactory;
+    }
 }

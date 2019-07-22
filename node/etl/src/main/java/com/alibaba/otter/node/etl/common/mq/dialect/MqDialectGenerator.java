@@ -1,6 +1,7 @@
 package com.alibaba.otter.node.etl.common.mq.dialect;
 
 import com.alibaba.otter.node.etl.common.mq.dialect.kafka.KafkaDialect;
+import com.alibaba.otter.node.etl.common.mq.dialect.kafka.RocketMqDialect;
 import com.alibaba.otter.node.etl.load.exception.LoadException;
 import com.alibaba.otter.shared.common.model.config.data.mq.MqDataMedia;
 import com.alibaba.otter.shared.common.model.config.data.mq.MqMediaSource;
@@ -17,11 +18,14 @@ public class MqDialectGenerator {
     protected LobHandler          oracleLobHandler;
 
     protected MqDialect generate(
-            MqMediaSource source,MqDataMedia dataMedia
+            MqMediaSource source
     ) {
 
-        if(source.getType().isMq()){
-          return   new KafkaDialect(source.getUrl(),dataMedia.getNamespace(),-1);
+        if(source.getType().isKafka()){
+            return  new KafkaDialect(source.getUrl());
+        }else if(source.getType().isRocketMq()){
+            //创建rocketMq
+            return new RocketMqDialect(source.getUrl(),source.getGroupName(),source.getInstanceName());
         }
         throw new LoadException("MqDialectGenerator 返回产生器无法产生");
 

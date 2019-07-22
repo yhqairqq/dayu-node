@@ -72,7 +72,6 @@ public class OtterTransformerFactory {
                 if (!pair.getSource().getId().equals(tableId)) { // 过滤tableID不为源的同步
                     continue;
                 }
-
                 OtterTransformer translate = lookup(pair.getSource(), pair.getTarget());
                 // 进行转化
                 Object item = translate.transform(eventData, new OtterTransformerContext(identity, pair, pipeline));

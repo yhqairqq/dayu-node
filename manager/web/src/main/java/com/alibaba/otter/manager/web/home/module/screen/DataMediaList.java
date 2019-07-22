@@ -68,6 +68,7 @@ public class DataMediaList {
             seniorDataMedia.setName(dataMedia.getName());
             seniorDataMedia.setNamespace(dataMedia.getNamespace());
             seniorDataMedia.setSource(dataMedia.getSource());
+            seniorDataMedia.setTopic(dataMedia.getTopic());
             List<DataMediaPair> pairs = dataMediaPairService.listByDataMediaId(dataMedia.getId());
             seniorDataMedia.setPairs(pairs);
             if (pairs.size() < 1) {

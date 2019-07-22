@@ -68,7 +68,7 @@ public class PipelineParameter implements Serializable {
                                                                                              // file同步启用多线程
     private Boolean               useFileEncrypt             = false;                       // 是否针对文件进行加密处理
     private Boolean               useExternalIp              = false;                       // 是否起用外部Ip
-    private Boolean               useTableTransform          = true;                        // 是否启用转化机制，比如类型不同，默认为true，兼容老逻辑
+    private Boolean               useTableTransform          = false;                       // 是否启用转化机制，比如类型不同，默认为true，兼容老逻辑
     private Boolean               enableCompatibleMissColumn = true;                        // 是否启用兼容字段不匹配处理
     private Boolean               skipNoRow                  = false;                       // 跳过反查没记录的情况
     private String                channelInfo;                                              // 同步标记，设置该标记后会在retl_mark中记录，在messageParse时进行check，相同则忽略
@@ -107,6 +107,8 @@ public class PipelineParameter implements Serializable {
     private String                systemDualTable;                                          // otter同步心跳表
     @Transient
     private RetrieverType         retriever;                                                // 下载方式
+
+    private Boolean passChange = true;     //传递变化
 
     /**
      * 合并pipeline参数设置
@@ -625,6 +627,15 @@ public class PipelineParameter implements Serializable {
 
     public void setSkipSelectException(Boolean skipSelectException) {
         this.skipSelectException = skipSelectException;
+    }
+
+
+    public Boolean getPassChange() {
+        return passChange==null? true:passChange;
+    }
+
+    public void setPassChange(Boolean passChange) {
+        this.passChange = passChange;
     }
 
     @Override

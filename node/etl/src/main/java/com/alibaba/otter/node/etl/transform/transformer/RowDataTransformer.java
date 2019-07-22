@@ -44,7 +44,7 @@ import com.google.common.collect.Multimap;
 
 /**
  * RowData -> RowData数据的转换
- * 
+ *
  * @author jianghang 2011-10-27 下午04:11:45
  * @version 4.0.0
  */
@@ -54,10 +54,19 @@ public class RowDataTransformer extends AbstractOtterTransformer<EventData, Even
 
     public EventData transform(EventData data, OtterTransformerContext context) {
         EventData result = new EventData();
+
+        //如果传递就
+        if(context.getPipeline().getParameters().getPassChange() &&
+                (context.getDataMediaPair().getTarget().getSource().getType().isKafka() ||
+                context.getDataMediaPair().getTarget().getSource().getType().isRocketMq())){
+            result.setBefore(data.getBefore());
+            result.setAfter(data.getAfter());
+        }
         // 处理Table转化
         DataMedia dataMedia = context.getDataMediaPair().getTarget();
         result.setPairId(context.getDataMediaPair().getId());
         result.setTableId(dataMedia.getId());
+
         // 需要特殊处理下multi场景
         buildName(data, result, context.getDataMediaPair());
         result.setEventType(data.getEventType());
@@ -109,7 +118,8 @@ public class RowDataTransformer extends AbstractOtterTransformer<EventData, Even
 
 
         if(dataMedia instanceof MqDataMedia){
-
+            result.setTopic(dataMedia.getTopic());
+            result.setPartitionTag(result.getTableName());
         }else{
             if (useTableTransform || enableCompatibleMissColumn) {// 控制一下是否需要反查table
                 // meta信息，如果同构数据库，完全没必要反查
@@ -144,7 +154,7 @@ public class RowDataTransformer extends AbstractOtterTransformer<EventData, Even
 
     /**
      * 设置对应的目标库schema.name，需要考虑mutl配置情况
-     * 
+     *
      * <pre>
      * case:
      * 1. 源:offer , 目：offer
@@ -219,7 +229,10 @@ public class RowDataTransformer extends AbstractOtterTransformer<EventData, Even
                     tnewPks.add(tnewPk);
                     // 转化old pk，这里不能再用translateColumnNames了，因为转化new
                     // pk已经remove过一次view name了
-                    toldPks.add(translateColumn(tnewPk, oldPk.getColumnValue(), dataMediaPair));
+                    EventColumn transEventColumn = translateColumn(tnewPk, oldPk.getColumnValue(), dataMediaPair);
+                    // modify by yuyiding 20180725 主键的isupdate还是oldpk的isupdate
+                    transEventColumn.setUpdate(oldPk.isUpdate());
+                    toldPks.add(transEventColumn);
                 }
             }
 
@@ -301,7 +314,7 @@ public class RowDataTransformer extends AbstractOtterTransformer<EventData, Even
                     if (canColumnsNotExist) {
                         return null;
                     } else {
-                        throw new TransformException(scolumn.getColumnName() + " is not found in " + table.toString()
+                        throw new TransformException(scolumn.getColumnName() + " is not found in " + data.getSchemaName()+":"+table.toString()
                                                      + " and source : " + dataMediaPair.getTarget().getNamespace()
                                                      + "." + dataMediaPair.getTarget().getName());
                     }
@@ -390,7 +403,7 @@ public class RowDataTransformer extends AbstractOtterTransformer<EventData, Even
 
     /**
      * 实现可reload的table meta，可替换table属性.
-     * 
+     *
      * @author jianghang 2012-5-16 下午04:34:18
      * @version 4.0.2
      */

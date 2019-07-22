@@ -42,6 +42,7 @@ public class DataMedia<Source extends DataMediaSource> implements Serializable {
     private String              encode;                                  // 编码
     private Date                gmtCreate;
     private Date                gmtModified;
+    private String              topic;
     // 运行时计算出来的属性，避免每次通过ConfigHelper进行正则解析
     private transient ModeValue nameMode;
     private transient ModeValue namespaceMode;
@@ -106,6 +107,15 @@ public class DataMedia<Source extends DataMediaSource> implements Serializable {
         }
     }
 
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
+
     public Long getId() {
         return id;
     }
@@ -164,7 +174,8 @@ public class DataMedia<Source extends DataMediaSource> implements Serializable {
 
     public Mode getMode() {
         if (mode == null) {// 重新计算下
-            mode = ConfigHelper.parseMode(namespace).getMode();
+            if(namespace != null)
+                 mode = ConfigHelper.parseMode(namespace).getMode();
         }
 
         return mode;

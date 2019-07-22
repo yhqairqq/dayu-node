@@ -1,11 +1,7 @@
 package com.alibaba.otter.node.etl.common.mq.dialect;
 
-import com.alibaba.dubbo.common.utils.ConfigUtils;
 import com.alibaba.otter.node.etl.common.datasource.DataSourceService;
-import com.alibaba.otter.node.etl.common.db.dialect.DbDialect;
-import com.alibaba.otter.node.etl.common.db.dialect.DbDialectGenerator;
-import com.alibaba.otter.shared.common.model.config.ConfigHelper;
-import com.alibaba.otter.shared.common.model.config.data.db.DbMediaSource;
+import com.alibaba.otter.shared.common.model.config.data.mq.MqDataMedia;
 import com.alibaba.otter.shared.common.model.config.data.mq.MqMediaSource;
 import com.google.common.base.Function;
 import com.google.common.collect.MigrateMap;
@@ -13,14 +9,7 @@ import com.google.common.collect.OtterMigrateMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ConnectionCallback;
-import org.springframework.jdbc.core.JdbcTemplate;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -28,28 +17,56 @@ import java.util.Set;
 /**
  * Created by yanghuanqing@wdai.com on 2018/4/28.
  */
-public class MqDialectFactory implements DisposableBean {
 
+/**
+ * Created by yanghuanqing@wdai.com on 2018/4/26.
+ */
+public class MqDialectFactory implements DisposableBean {
     private static final Logger logger = LoggerFactory.getLogger(MqDialectFactory.class);
+
     private DataSourceService dataSourceService;
     private MqDialectGenerator mqDialectGenerator;
 
-    // 第一层pipelineId , 第二层DbMediaSource id
-    private Map<Long, Map<MqMediaSource, DbDialect>> dialects;
+    // 第一层pipelineId , MqMediaSource id
+    private Map<Long, Map<MqMediaSource, MqDialect>> dialects;
 
-    public MqDialectFactory(){
+    public MqDialectFactory() {
+        dialects = OtterMigrateMap.makeSoftValueComputingMapWithRemoveListenr(new Function<Long, Map<MqMediaSource, MqDialect>>() {
+
+                  public Map<MqMediaSource, MqDialect> apply(final Long pipelineId) {
+                      // 构建第二层map
+                      return MigrateMap.makeComputingMap(new Function<MqMediaSource, MqDialect>() {
+
+                          public MqDialect apply(final MqMediaSource source) {
+                              return mqDialectGenerator.generate(source);
+                          }
+                      });
+                  }
+              },
+                new OtterMigrateMap.OtterRemovalListener<Long, Map<MqMediaSource, MqDialect>>() {
+                    @Override
+                    public void onRemoval(Long pipelineId, Map<MqMediaSource, MqDialect> dialect) {
+                        if (dialect == null) {
+                            return;
+                        }
+                        for (MqDialect mqDialect : dialect.values()) {
+                            mqDialect.destory();
+                        }
+                    }
+
+                });
 
     }
 
-    public DbDialect getDbDialect(Long pipelineId, DbMediaSource source) {
+    public MqDialect getMqDialect(Long pipelineId, MqMediaSource source) {
         return dialects.get(pipelineId).get(source);
     }
 
     public void destory(Long pipelineId) {
-        Map<MqMediaSource, DbDialect> dialect = dialects.remove(pipelineId);
+        Map<MqMediaSource, MqDialect> dialect = dialects.remove(pipelineId);
         if (dialect != null) {
-            for (DbDialect dbDialect : dialect.values()) {
-                dbDialect.destory();
+            for (MqDialect mqDialect : dialect.values()) {
+                mqDialect.destory();
             }
         }
     }
@@ -67,4 +84,7 @@ public class MqDialectFactory implements DisposableBean {
         this.dataSourceService = dataSourceService;
     }
 
+    public void setDbDialectGenerator(MqDialectGenerator mqDialectGenerator) {
+        this.mqDialectGenerator = mqDialectGenerator;
+    }
 }

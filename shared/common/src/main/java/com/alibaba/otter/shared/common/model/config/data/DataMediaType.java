@@ -32,6 +32,8 @@ public enum DataMediaType {
     MEMCACHE,
     /** mq */
     MQ,
+    KAFKA,
+    ROCKETMQ,
     /** napoli */
     NAPOLI,
     /** diamond push for us */
@@ -64,6 +66,8 @@ public enum DataMediaType {
     public boolean isMq() {
         return this == DataMediaType.MQ;
     }
+    public boolean isKafka(){return this == DataMediaType.KAFKA;}
+    public boolean isRocketMq(){return this == DataMediaType.ROCKETMQ;}
 
     public boolean isNapoli() {
         return this == DataMediaType.NAPOLI;

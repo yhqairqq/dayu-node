@@ -11,8 +11,18 @@
 		<property name="dataSourceService" ref="dataSourceService" />
 		<property name="dbDialectGenerator" ref="dbDialectGenerator" />
 	</bean>
+
+	<bean id="mqDialectFactory" class="com.alibaba.otter.node.etl.common.mq.dialect.MqDialectFactory">
+		<property name="dataSourceService" ref="dataSourceService" />
+		<property name="dbDialectGenerator" ref="mqDialectGenerator" />
+	</bean>
 	
 	<bean id="dbDialectGenerator" class="com.alibaba.otter.node.etl.common.db.dialect.DbDialectGenerator">
+		<property name="defaultLobHandler" ref="defaultLobHandler" />
+		<property name="oracleLobHandler" ref="oracleLobHandler" />
+	</bean>
+
+	<bean id="mqDialectGenerator" class="com.alibaba.otter.node.etl.common.mq.dialect.MqDialectGenerator">
 		<property name="defaultLobHandler" ref="defaultLobHandler" />
 		<property name="oracleLobHandler" ref="oracleLobHandler" />
 	</bean>

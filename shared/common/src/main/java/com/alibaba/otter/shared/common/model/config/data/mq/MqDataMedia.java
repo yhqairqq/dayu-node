@@ -26,6 +26,17 @@ import com.alibaba.otter.shared.common.model.config.data.DataMedia;
  */
 public class MqDataMedia extends DataMedia<MqMediaSource> {
 
+
+
     private static final long serialVersionUID = 1347886915428919398L;
 
+    private String topic;
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
 }

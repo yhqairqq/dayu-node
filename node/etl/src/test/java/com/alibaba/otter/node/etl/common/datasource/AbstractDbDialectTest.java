@@ -30,6 +30,11 @@ import com.alibaba.otter.shared.common.utils.meta.DdlUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 
 /**
  * 类TestAbstractDbDialect.java的实现描述：TODO 类实现描述
@@ -55,68 +60,69 @@ public class AbstractDbDialectTest {
     }
 
     public static void main(String[] args) {
-        DataSource dataSource0 = createDataSource("jdbc:mysql://172.16.10.68:3306/aky0", "root", "123456",
+        DataSource dataSource0 = createDataSource("jdbc:mysql://10.111.14.140:3307/otter_sink", "re_write", "IXAaaWWiZhn1Nces",
                 "com.mysql.jdbc.Driver", DataMediaType.MYSQL, "utf-8");
-        DataSource dataSource1 = createDataSource("jdbc:mysql://172.16.10.68:3306/aky1", "root", "123456",
-                "com.mysql.jdbc.Driver", DataMediaType.MYSQL, "utf-8");
+//        DataSource dataSource1 = createDataSource("jdbc:mysql://172.16.10.68:3306/aky1", "root", "123456",
+//                "com.mysql.jdbc.Driver", DataMediaType.MYSQL, "utf-8");
         JdbcTemplate jdbcTemplate0 = new JdbcTemplate(dataSource0);
-        String sql0 = "insert into `aky0`.`meta_table_config0` ( `status`, `modify_time`, `catlog`, `db_type`, `gmt_time`, `table_name`, `ip`, `schema_name`) values ( ?,?, ?, ?, ?, ?, ?, ?);";
-        MetaDataConfig metaDataConfig0 = new MetaDataConfig();
-        metaDataConfig0.setStatus(0);
-        metaDataConfig0.setGmtTime(new Date());
-        metaDataConfig0.setModifyTime(new Date());
-        metaDataConfig0.setCatlog("0");
-        metaDataConfig0.setDbType("mysql");
-        metaDataConfig0.setIp("172.16.10.68");
-        metaDataConfig0.setSchemaName("aky");
-        metaDataConfig0.setTableName("metadata");
-        jdbcTemplate0.update(sql0,metaDataConfig0.getStatus(),
-                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
-                metaDataConfig0.getCatlog(),
-                metaDataConfig0.getDbType(),
-                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
-                metaDataConfig0.getTableName(),
-                metaDataConfig0.getIp(),
-                metaDataConfig0.getSchemaName()
-                );
+        String sql0 = "insert into `otter_sink`.`source_a` ( `f4`, `name`, `city_id`, `f5`) values ( ?, ?, ?, ?)";
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
 
-        MetaDataConfig metaDataConfig1 = new MetaDataConfig();
-        metaDataConfig1.setStatus(1);
-        metaDataConfig1.setGmtTime(new Date());
-        metaDataConfig1.setModifyTime(new Date());
-        metaDataConfig1.setCatlog("1");
-        metaDataConfig1.setDbType("mysql");
-        metaDataConfig1.setIp("172.16.10.68");
-        metaDataConfig1.setSchemaName("aky");
-        metaDataConfig1.setTableName("metadata");
-        JdbcTemplate jdbcTemplate1 = new JdbcTemplate(dataSource1);
-        for(int i=0;i<10;i++){
-            jdbcTemplate0.update(sql0,metaDataConfig0.getStatus(),
-                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
-                    metaDataConfig0.getCatlog(),
-                    metaDataConfig0.getDbType(),
-                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
-                    metaDataConfig0.getTableName(),
-                    metaDataConfig0.getIp(),
-                    metaDataConfig0.getSchemaName()
-            );
+//        MetaDataConfig metaDataConfig0 = new MetaDataConfig();
+//        metaDataConfig0.setStatus(0);
+//        metaDataConfig0.setGmtTime(new Date());
+//        metaDataConfig0.setModifyTime(new Date());
+//        metaDataConfig0.setCatlog("0");
+//        metaDataConfig0.setDbType("mysql");
+//        metaDataConfig0.setIp("172.16.10.68");
+//        metaDataConfig0.setSchemaName("aky");
+//        metaDataConfig0.setTableName("metadata");
+//        jdbcTemplate0.update(sql0,
+//                metaDataConfig0.getStatus(),
+//                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
+//                metaDataConfig0.getCatlog(),
+//                metaDataConfig0.getDbType(),
+//                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
+//                metaDataConfig0.getTableName(),
+//                metaDataConfig0.getIp(),
+//                metaDataConfig0.getSchemaName()
+//                );
 
-            jdbcTemplate1.update(sql0,metaDataConfig1.getStatus(),
-                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
-                    metaDataConfig1.getCatlog(),
-                    metaDataConfig1.getDbType(),
-                    new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
-                    metaDataConfig1.getTableName(),
-                    metaDataConfig1.getIp(),
-                    metaDataConfig1.getSchemaName()
-            );
+//        MetaDataConfig metaDataConfig1 = new MetaDataConfig();
+//        metaDataConfig1.setStatus(1);
+//        metaDataConfig1.setGmtTime(new Date());
+//        metaDataConfig1.setModifyTime(new Date());
+//        metaDataConfig1.setCatlog("1");
+//        metaDataConfig1.setDbType("mysql");
+//        metaDataConfig1.setIp("172.16.10.68");
+//        metaDataConfig1.setSchemaName("aky");
+//        metaDataConfig1.setTableName("metadata");
+//        JdbcTemplate jdbcTemplate1 = new JdbcTemplate(dataSource1);
+        int threadSize = 2;
+        int recordSize = 100000;
+        int unitRecordSize = recordSize/2;
+        for(int i=0;i<threadSize;i++){
+             int finalI = i;
+            executorService.submit(new Runnable() {
+                 @Override
+                 public void run() {
+                     for(int start = finalI *unitRecordSize;start < unitRecordSize*(finalI+1);start++){
+                         // ( `f4`, `name`, `city_id`, `f5`)
+                         jdbcTemplate0.update(sql0,
+                                 "name"+start,
+                                 "name"+start,
+                                 start,
+                                 start
+                         );
+
+//                         System.out.println(Thread.currentThread().getName()+":"+start);
+                     }
+                 }
+             });
         }
-
-
-
         System.out.println(jdbcTemplate0);
 
-        System.out.println(jdbcTemplate1);
+//        System.out.println(jdbcTemplate1);
     }
 
     private static DataSource createDataSource(String url, String userName, String password, String driverClassName,

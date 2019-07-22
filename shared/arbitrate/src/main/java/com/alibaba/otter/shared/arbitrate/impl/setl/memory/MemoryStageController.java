@@ -219,6 +219,7 @@ public class MemoryStageController extends ArbitrateLifeCycle {
             Long processId = Collections.min(progress.keySet());
             StageProgress stage = progress.get(processId);
             // stage可能为空，针对select未完成时，对应的值就为null
+
             if (stage != null && stage != nullProgress && stage.getStage().isTransform()) {
                 return processId;
             }

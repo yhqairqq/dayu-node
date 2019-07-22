@@ -52,7 +52,6 @@ public class TerminMemoryArbitrateEvent implements TerminArbitrateEvent {
         if (logger.isDebugEnabled()) {
             logger.debug("## await pipeline[{}] processId[{}] is termin", pipelineId, eventData.getProcessId());
         }
-
         return eventData;
     }
 

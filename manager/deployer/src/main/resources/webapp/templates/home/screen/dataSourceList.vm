@@ -56,7 +56,11 @@ $control.setTemplate("home:navigation.vm")
 		#set ($dataSourceInfoURL = $homeModule.setTarget("dataSourceInfo.vm").addQueryData("dataMediaSourceId", $source.id))
 		<a href="$dataSourceInfoURL"><img src="images/ico_edit.png" width="13" height="13" /><span class="ico_font">查看</span></a>
 		#if($user.authorizeType.isAdmin())
-    		#set ($editURL = $homeModule.setTarget("editDataSource.vm").addQueryData("dataMediaSourceId", $source.id).addQueryData("pageIndex", $!paginator.page).addQueryData("searchKey", $!searchKey))
+			#if($source.type == "KAFKA" ||$source.type == "ROCKETMQ")
+				#set ($editURL = $homeModule.setTarget("editMqSource.vm").addQueryData("dataMediaSourceId", $source.id).addQueryData("pageIndex", $!paginator.page).addQueryData("searchKey", $!searchKey))
+			#else
+				#set ($editURL = $homeModule.setTarget("editDataSource.vm").addQueryData("dataMediaSourceId", $source.id).addQueryData("pageIndex", $!paginator.page).addQueryData("searchKey", $!searchKey))
+			#end
     		<span class="ico_line">|</span><a href="$editURL"><img src="images/ico_edit.png" alt=" " width="13" height="13" /><span class="ico_font">编辑</span></a>
     		
 			#if($!source.isUsed())
@@ -75,7 +79,7 @@ $control.setTemplate("home:navigation.vm")
   <!--常规按钮-->
       #if($user.authorizeType.isAdmin())
 		<div class="btn"><a href="addDataSource.htm">添加</a></div>
-          <div class="btn"><a href="addMqSource.htm">添加Mq</a></div>
+		<div class="btn"><a href="addMqSource.htm">添加Mq</a></div>
 	  #end
   
      

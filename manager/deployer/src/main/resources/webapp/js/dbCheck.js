@@ -14,6 +14,14 @@ function checkMap() {
     
     Hello.checkMap(namespace, name, dataSourceId, callback);  
 }
+
+function checkTablesPrimaryKey(){
+    var namespace = document.getElementById('namespace').value;
+    var name = document.getElementById('name').value;
+    var dataSourceId = document.getElementById('dataSourceId').value;
+
+    Hello.checkTablesPrimaryKey(namespace, name, dataSourceId, callback);
+}
   
 function callback(msg) {  
     DWRUtil.setValue('result', msg);  

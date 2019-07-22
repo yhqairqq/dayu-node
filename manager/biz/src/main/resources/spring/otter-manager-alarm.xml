@@ -27,8 +27,13 @@
 		</property>
 	</bean>
 
-	<bean id="alarmService" class="com.alibaba.otter.manager.biz.common.alarm.DefaultAlarmService">
-		<property name="mailSender" ref="mailSender" />
-		<property name="username" value="${otter.manager.monitor.email.username}" />
+	<!--<bean id="alarmService" class="com.alibaba.otter.manager.biz.common.alarm.DefaultAlarmService">-->
+		<!--<property name="mailSender" ref="mailSender" />-->
+		<!--<property name="username" value="${otter.manager.monitor.email.username}" />-->
+	<!--</bean>-->
+
+	<bean id="alarmService" class="com.alibaba.otter.manager.biz.common.alarm.DingDingAlarmService" init-method="init">
+		<!--<property name="WEBHOOK_TOKEN" ref="mailSender" />-->
+		<property name="webhook" value="${otter.manager.monitor.dingtalk}" />
 	</bean>
 </beans>

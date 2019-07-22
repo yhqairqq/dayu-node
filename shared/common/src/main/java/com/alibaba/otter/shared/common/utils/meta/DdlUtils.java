@@ -115,6 +115,88 @@ public class DdlUtils {
         return findTable(jdbcTemplate, catalogName, schemaName, tableName, null);
     }
 
+
+    public static List<Table> findTables(JdbcTemplate jdbcTemplate, final String catalogName, final String schemaName,
+                                  final List<String> tableNames) throws Exception {
+        return findTables(jdbcTemplate, catalogName, schemaName, tableNames, null);
+    }
+
+    public static List<Table> findTables(JdbcTemplate jdbcTemplate, final String catalogName, final String schemaName,
+                                        final List<String> tableNames,final DdlUtilsFilter filter) throws Exception{
+        return (List<Table>) jdbcTemplate.execute(new ConnectionCallback() {
+
+            public Object doInConnection(Connection con) throws SQLException, DataAccessException {
+                List<Table> tables = new ArrayList<>();
+                DatabaseMetaDataWrapper metaData = new DatabaseMetaDataWrapper();
+                boolean isDRDS = false;
+                try {
+                    if (filter != null) {
+                        con = filter.filterConnection(con);
+                        Assert.notNull(con);
+                    }
+                    DatabaseMetaData databaseMetaData = con.getMetaData();
+                    if (filter != null) {
+                        databaseMetaData = filter.filterDataBaseMetaData(jdbcTemplate, con, databaseMetaData);
+                        Assert.notNull(databaseMetaData);
+                    }
+
+                    String databaseName = databaseMetaData.getDatabaseProductName();
+                    String version = databaseMetaData.getDatabaseProductVersion();
+                    if (StringUtils.startsWithIgnoreCase(databaseName, "mysql")
+                            && StringUtils.contains(version, "-TDDL-")) {
+                        isDRDS = true;
+                    }
+
+                    metaData.setMetaData(databaseMetaData);
+                    metaData.setTableTypes(TableType.toStrings(SUPPORTED_TABLE_TYPES));
+                    metaData.setCatalog(catalogName);
+                    metaData.setSchemaPattern(schemaName);
+
+                    for(String tableName:tableNames){
+                        String convertTableName = tableName;
+                        if (databaseMetaData.storesUpperCaseIdentifiers()) {
+                            metaData.setCatalog(catalogName.toUpperCase());
+                            metaData.setSchemaPattern(schemaName.toUpperCase());
+                            convertTableName = tableName.toUpperCase();
+                        }
+                        if (databaseMetaData.storesLowerCaseIdentifiers()) {
+                            metaData.setCatalog(catalogName.toLowerCase());
+                            metaData.setSchemaPattern(schemaName.toLowerCase());
+                            convertTableName = tableName.toLowerCase();
+                        }
+
+                        ResultSet tableData = null;
+                        try {
+                            tableData = metaData.getTables(convertTableName);
+
+                            while ((tableData != null) && tableData.next()) {
+                                Map<String, Object> values = readColumns(tableData, initColumnsForTable());
+
+                                Table table = readTable(metaData, values);
+                                if (table.getName().equalsIgnoreCase(tableName)) {
+                                    tables.add(table);
+                                }
+
+                            }
+                        } finally {
+                            JdbcUtils.closeResultSet(tableData);
+                        }
+                    }
+
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
+
+//                makeAllColumnsPrimaryKeysIfNoPrimaryKeysFound(table);
+//                if (isDRDS) {
+//                    makeDRDSShardColumnsAsPrimaryKeys(table, jdbcTemplate, catalogName, schemaName, tableName);
+//                }
+                return tables;
+            }
+        });
+    }
+
+
     public static Table findTable(final JdbcTemplate jdbcTemplate, final String catalogName, final String schemaName,
                                   final String tableName, final DdlUtilsFilter filter) throws Exception {
         return (Table) jdbcTemplate.execute(new ConnectionCallback() {
@@ -185,6 +267,7 @@ public class DdlUtils {
             }
         });
     }
+
 
     @SuppressWarnings("unchecked")
     public static List<Table> findTables(final JdbcTemplate jdbcTemplate, final String catalogName,

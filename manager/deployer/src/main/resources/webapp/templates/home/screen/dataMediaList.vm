@@ -37,6 +37,7 @@ $control.setTemplate("home:navigation.vm")
       <th>序号</th>
 	  <th>Schema Name</th>
 	  <th>Table Name</th>
+		<th>Topic Name</th>
 	  <th>数据源</th>
 	  <th>源类型</th>
 	  <th>操作</th>
@@ -47,6 +48,7 @@ $control.setTemplate("home:navigation.vm")
       <td width="9%">$!dataMedia.id</td>
 	  <td>$!dataMedia.namespace</td>
       <td width="16%">$!dataMedia.name</td>
+        <td width="16%">$!dataMedia.topic</td>
       <td>
 		#set ($dataSourceInfoURL = $homeModule.setTarget("dataSourceInfo.vm").addQueryData("dataMediaSourceId", $!dataMedia.source.id))
 		<a href="$dataSourceInfoURL">$!dataMedia.source.name</a>
@@ -74,7 +76,7 @@ $control.setTemplate("home:navigation.vm")
      <!--常规按钮-->
      #if($user.authorizeType.isAdmin())
 			<div class="btn"><a href="addDataMedia.htm">添加</a></div>
-            <div class="btn"><a href="addMqDataMedia.htm">添加Mq配置</a></div>
+##            <div class="btn"><a href="addMqDataMedia.htm">添加Mq配置</a></div>
 	 #end
   
      

@@ -136,6 +136,9 @@ $control.setTemplate("home:navigation.vm")
   <tr class="super"> 
   <th>兼容字段新增同步：</th><td>#if($!pipeline.parameters.enableCompatibleMissColumn) 开启 #else 关闭 #end</td>
   </tr>
+  <tr class="super">
+  <th>传递变化：</th><td>#if($!pipeline.parameters.passChange) 开启 #else 关闭 #end</td>
+  </tr>
   <tr class="super"> 
   <th>自定义同步标记：</th><td>$!pipeline.parameters.channelInfo</td>
   </tr>

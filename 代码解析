@@ -1,6 +1,8 @@
 
 
+-DappName=otter-node -Ddubbo.application.logger=slf4j -Dlogback.configurationFile=logback.xml
 
+-DappName=otter-node -Ddubbo.application.logger=slf4j -Dlogback.configurationFile=logback.xml -Dnid=1
 
 AbstractCanalInstance  canal实例中的start方法启动，其中canlEventParser就是从这里启动
 
@@ -201,13 +203,70 @@ filter-> canal  EmbedSelecteor->   CanalFilterSupport.makeFilterExpression(pip)
 cannalInstanceWithManager->filter AviaterFilter(filter) -> abstractEventParser
 LogEventConvert -> aviaterFilter
 
-
+EventTransactionBuffer->flush接口将缓存数据更新到->consumeTheEventAndProfilingIfNecessary  ->eventSink(CanalEventSink)中
 
 -->LogEventConvert parseRowsEvent中直接进行过滤订阅的数据库和表
 LogDecoder  TABLE_MAP_EVENT-> WRITE_ROWS_EVENT_V1  将fetch 转换成event  在此过程中将没有订阅的表进行过滤
 
 LogEventConvert  binlogParser.parser在此过程中将没有订阅的表进行过滤  过滤通过的数据转换成entry 存储到transactionBuffer中
-func.sink->binlogParser(LogEventConvert)  将event 转换成entry 并且缓存到store
+func.sink->binlogParser(LogEventConvert)  将event 转换成entry 并且缓存到store -> EntryEventSink  -->doSink 进行handler过滤  OtterDownStreamHandler
+
+-->CanalEventStore<Event> eventStore(EntryEventSink) =  AbstractCanalInsrance.CanalEventStore;   
+
+取数 getEvents(canalInstance.getEventStore()  tryGet->events   如果不是单条数据，分配批次号 全局唯一
+
+消费在CanalServerWithEmbeded->get
+
+MessageParser->
+
+
+e   t    l
+
+
+
+
+Tranform  主要功能
+
+
+
+batchId   <-canalInstance.getMetaManager().addBatch(clientIdentity, events.getPositionRange());
+
+
+定位
+  erosaConnection.dump(startPosition.getJournalName(),
+                                        startPosition.getPosition(),
+                                        sinkHandler);
+
+
+
+StatisticsClientServiceImpl.sendTableStats -> StatsRemoteServiceImpl.onTableStat()
+
+自由门全量数据同步原理
+LogEventConvert 通过filter进行过滤，过滤内容其中一部分来自于systemparameters
+过滤器filter -> AviaterRegexFilter
+   FreedomExtract（初步组装） ->DatabaseExtrator（根据id抽取具体数据组装）
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 | mysql-bin.000003 | 5171664 | Table_map      |         1 |     5171725 | table_id: 128 (otter.delay_stat)
 | mysql-bin.000003 | 5171725 | Write_rows     |         1 |     5171801 | table_id: 128 flags: STMT_END_F                                                                     |

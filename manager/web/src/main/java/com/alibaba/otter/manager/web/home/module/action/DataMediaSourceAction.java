@@ -68,7 +68,8 @@ public class DataMediaSourceAction extends AbstractAction {
                 err.setMessage("invalidDataMediaSource");
                 return;
             }
-        } else if (dataMediaSource.getType().isNapoli() || dataMediaSource.getType().isMq()) {
+        } else if (dataMediaSource.getType().isNapoli() || dataMediaSource.getType().isKafka() || dataMediaSource.getType().isRocketMq()) {
+
             MqMediaSource mqMediaSource = new MqMediaSource();
             dataMediaSourceInfo.setProperties(mqMediaSource);
 
@@ -102,18 +103,30 @@ public class DataMediaSourceAction extends AbstractAction {
                        Navigator nav) throws Exception {
         DbMediaSource dbMediaSource = new DbMediaSource();
         dataMediaSourceInfo.setProperties(dbMediaSource);
+        if(dbMediaSource.getType().isMysql() || dbMediaSource.getType().isOracle()){
+            if (dbMediaSource.getType().isMysql()) {
+                dbMediaSource.setDriver("com.mysql.jdbc.Driver");
+            } else if (dbMediaSource.getType().isOracle()) {
+                dbMediaSource.setDriver("oracle.jdbc.driver.OracleDriver");
+            }
 
-        if (dbMediaSource.getType().isMysql()) {
-            dbMediaSource.setDriver("com.mysql.jdbc.Driver");
-        } else if (dbMediaSource.getType().isOracle()) {
-            dbMediaSource.setDriver("oracle.jdbc.driver.OracleDriver");
-        }
+            try {
+                dataMediaSourceService.modify(dbMediaSource);
+            } catch (RepeatConfigureException rce) {
+                err.setMessage("invalidDataMediaSource");
+                return;
+            }
+        }else if (dbMediaSource.getType().isNapoli() || dbMediaSource.getType().isKafka() || dbMediaSource.getType().isRocketMq()) {
 
-        try {
-            dataMediaSourceService.modify(dbMediaSource);
-        } catch (RepeatConfigureException rce) {
-            err.setMessage("invalidDataMediaSource");
-            return;
+            MqMediaSource mqMediaSource = new MqMediaSource();
+            dataMediaSourceInfo.setProperties(mqMediaSource);
+
+            try {
+                dataMediaSourceService.modify(mqMediaSource);
+            } catch (RepeatConfigureException rce) {
+                err.setMessage("invalidDataMediaSource");
+                return;
+            }
         }
 
         nav.redirectToLocation("dataSourceList.htm?pageIndex=" + pageIndex + "&searchKey=" + urlEncode(searchKey));

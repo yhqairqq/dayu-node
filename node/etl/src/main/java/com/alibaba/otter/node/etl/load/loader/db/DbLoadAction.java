@@ -32,6 +32,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.alibaba.dubbo.common.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.ddlutils.model.Column;
@@ -81,6 +82,8 @@ import com.alibaba.otter.shared.etl.model.EventType;
 import com.alibaba.otter.shared.etl.model.Identity;
 import com.alibaba.otter.shared.etl.model.RowBatch;
 
+import javax.xml.bind.SchemaOutputResolver;
+
 /**
  * 数据库load的执行入口
  *
@@ -114,6 +117,7 @@ public class DbLoadAction implements InitializingBean, DisposableBean {
 
         try {
             List<EventData> datas = rowBatch.getDatas();
+
             context.setPrepareDatas(datas);
             // 执行重复录入数据过滤
             datas = context.getPrepareDatas();
@@ -357,7 +361,7 @@ public class DbLoadAction implements InitializingBean, DisposableBean {
                 Boolean result = dbDialect.getJdbcTemplate().execute(new StatementCallback<Boolean>() {
 
                     public Boolean doInStatement(Statement stmt) throws SQLException, DataAccessException {
-                        Boolean result = false;
+                        Boolean result = true;
                         if (dbDialect instanceof MysqlDialect && StringUtils.isNotEmpty(data.getDdlSchemaName())) {
                             // 如果mysql，执行ddl时，切换到在源库执行的schema上
                             // result &= stmt.execute("use " +
@@ -755,9 +759,10 @@ public class DbLoadAction implements InitializingBean, DisposableBean {
 
                     isRequired = isRequiredMap.get(StringUtils.lowerCase(column.getColumnName()));
                     if (isRequired == null) {
-                        throw new LoadException(String.format("column name %s is not found in Table[%s]",
+                        throw new LoadException(String.format("column name %s is not found in Table[schma:%s %s]",
                             column.getColumnName(),
-                            table.toString()));
+                                data.getSchemaName(),
+                           table.toString()));
                     }
                 }
 
