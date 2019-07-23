@@ -183,6 +183,7 @@
 			<dwr:include method="checkMap" />
 			<dwr:include method="checkNamespaceTables" />
 			<dwr:include method="checkTablesPrimaryKey" />
+			<dwr:include method="listBinlog" />
 		</dwr:remote>
 	</bean>
 	

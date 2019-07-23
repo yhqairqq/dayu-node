@@ -387,7 +387,9 @@ public class MessageParser {
                 }
             }
         }
-
+        if(pipeline.getParameters().getDataSyncSkip()){
+            return null;
+        }
         List<EventData> eventDatas = new ArrayList<EventData>();
         for (RowData rowData : rowChange.getRowDatasList()) {
             EventData eventData = internParse(pipeline, entry, rowChange, rowData);

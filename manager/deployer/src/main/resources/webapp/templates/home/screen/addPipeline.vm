@@ -276,6 +276,14 @@ $control.setTemplate("home:navigation.vm")
               <input type="radio" name="$pipelineParameterGroup.dryRun.key" value="false" id="RadioGroup1_3" checked="checked" class="radio"/>否 
         </td>
       </tr>
+      <tr
+    <tr class="super">
+        <th width="300">跳过数据同步：</th>
+        <td width="329">
+            <input type="radio" name="$pipelineParameterGroup.dataSyncSkip.key" value="true" id="RadioGroup1_2"  class="radio"/>是
+            <input type="radio" name="$pipelineParameterGroup.dataSyncSkip.key" value="false" id="RadioGroup1_3" checked="checked"  class="radio"/>否
+        </td>
+    </tr>
 	  <tr class="super"> 
         <th width="300">支持ddl同步：</th>
         <td width="329">

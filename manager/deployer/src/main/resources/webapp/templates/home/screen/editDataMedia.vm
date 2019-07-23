@@ -79,6 +79,7 @@ function changeKeyword(id, name) {
 	  <tr> 
         <th><input type='button' value='验证连接表' onclick='checkMap();' /><br><hr align="right" style="width:100px;">
             <input type='button' value='查询Schema&Table' onclick='checkNamespaceTables()' />
+            <input type="button" value="表主键验证" onclick="checkTablesPrimaryKey()" />
 			</th>
         <td>
 			<span class="red" id="result"></span>

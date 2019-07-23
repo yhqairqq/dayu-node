@@ -16,6 +16,9 @@
 
 package com.alibaba.otter.manager.biz.utils;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +26,10 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import com.alibaba.otter.canal.parse.driver.mysql.packets.server.ResultSetPacket;
+import com.alibaba.otter.canal.parse.inbound.mysql.MysqlConnection;
 import com.alibaba.otter.shared.common.model.config.data.DataMedia;
+import com.google.common.base.Strings;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ddlutils.model.Table;
 import org.slf4j.Logger;
@@ -300,6 +306,54 @@ public class DataSourceChecker {
 
         return TABLE_SUCCESS;
 
+    }
+
+    /**
+     * 查看binlog文件列表
+     * @param url
+     * @param username
+     * @param password
+     * @return
+     */
+    public String  listBinlog(String url,String username,String password)  {
+        if(Strings.isNullOrEmpty(url)
+                || Strings.isNullOrEmpty(username)
+                || Strings.isNullOrEmpty(password)
+                )
+            return "连接信息错误";
+        List<String> binlogs= new ArrayList<>();
+        MysqlConnection mysqlConnection = null;
+      try{
+          String fisrt =  url.trim().split(";")[0];
+          String domain = fisrt.substring(0,fisrt.indexOf(":"));
+          InetAddress inetAddress = InetAddress.getByName(domain);
+          InetSocketAddress inetSocketAddress = new InetSocketAddress(inetAddress,3306);
+           mysqlConnection = new MysqlConnection(inetSocketAddress,username,password);
+          mysqlConnection.connect();
+        ResultSetPacket packet =  mysqlConnection.query("show binary logs");
+         int cols =  packet.getFieldDescriptors().size();
+        if(packet != null){
+            for(int j=0;j<packet.getFieldValues().size();){
+                String row = "";
+                for(int c = 0;c < cols; c++){
+                   row +=  packet.getFieldValues().get(j++)+" ";
+                }
+                binlogs.add(row);
+            }
+        }
+      }catch (Exception e){
+          e.printStackTrace();
+            return "连接信息错误";
+      }finally {
+          if(mysqlConnection != null){
+              try {
+                  mysqlConnection.disconnect();
+              } catch (IOException e) {
+                  e.printStackTrace();
+              }
+          }
+      }
+        return StringUtils.join(binlogs,",");
     }
 
     /**

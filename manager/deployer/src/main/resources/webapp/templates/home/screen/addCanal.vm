@@ -1,4 +1,8 @@
 $control.setTemplate("home:navigation.vm")
+<script type='text/javascript' src='dwr/interface/Hello.js'></script>
+<script type='text/javascript' src='dwr/engine.js'></script>
+<script type='text/javascript' src='dwr/util.js'></script>
+<script type='text/javascript' src='js/dbCheck.js'></script>
 <script language="javascript">
 <!--
 	changeNav("canal");
@@ -105,10 +109,10 @@ $control.setTemplate("home:navigation.vm")
         <th width="300">数据源类型：</th>
         <td width="329">
 			<input type="radio" name="$canalParameterGroup.sourcingType.key" value="MYSQL" onclick="changeDisplay('mysqlSourcing','table-row');changeDisplay('oracleSourcing','none');changeDisplay('localSourcing','none');" id="RadioGroup5_0" checked="checked" class="radio"/>mysql &nbsp;
-			#**
+
 			<input type="radio" name="$canalParameterGroup.sourcingType.key" value="ORACLE" onclick="changeDisplay('mysqlSourcing','none');changeDisplay('oracleSourcing','table-row');changeDisplay('localSourcing','none');" id="RadioGroup5_1" class="radio"/>oracle &nbsp;
             <input type="radio" name="$canalParameterGroup.sourcingType.key" value="LOCALBINLOG" onclick="changeDisplay('mysqlSourcing','none');changeDisplay('oracleSourcing','none');changeDisplay('localSourcing','table-row');" id="RadioGroup5_2" class="radio"/>localbinlog &nbsp;
-			*#
+
 			<br />
 			<span class="red">#addCanalMessage ($canalParameterGroup.sourcingType)</span>
 		</td>
@@ -116,7 +120,7 @@ $control.setTemplate("home:navigation.vm")
 	  <tr> 
         <th width="300">数据库地址：</th>
         <td width="329">
-			<textarea class="service" name="$canalParameterGroup.groupDbAddresses.key" cols="45" rows="5" >$!canal.canalParameter.groupDbAddresses.value</textarea><span class="red">*</span>
+			<textarea id="url" class="service" name="$canalParameterGroup.groupDbAddresses.key" cols="45" rows="5" >$!canal.canalParameter.groupDbAddresses.value</textarea><span class="red">*</span>
 			<br />
 			<span>格式如 127.0.0.1:3306;(必须以分号结束，可添多个)</span>
 			<br />
@@ -126,7 +130,7 @@ $control.setTemplate("home:navigation.vm")
 	  <tr> 
         <th width="300">数据库帐号：</th>
         <td width="329">
-            <input type="text" name="$canalParameterGroup.dbUsername.key" value="$!canal.canalParameter.dbUsername.value" class="setting_input"/><span class="red">*</span>
+            <input id="username" type="text" name="$canalParameterGroup.dbUsername.key" value="$!canal.canalParameter.dbUsername.value" class="setting_input"/><span class="red">*</span>
 			<br />
 			<span class="red">#addCanalMessage ($canalParameterGroup.dbUsername)</span>
 		</td>
@@ -134,7 +138,7 @@ $control.setTemplate("home:navigation.vm")
 	  <tr> 
         <th width="300">数据库密码：</th>
         <td width="329">
-            <input type="password" name="$canalParameterGroup.dbPassword.key" value="" class="setting_input"/><span class="red">*</span>
+            <input id="password" type="password" name="$canalParameterGroup.dbPassword.key" value="" class="setting_input"/><span class="red">*</span>
 			<br />
 			<span class="red">#addCanalMessage ($canalParameterGroup.dbPassword)</span>
 		</td>
@@ -147,6 +151,14 @@ $control.setTemplate("home:navigation.vm")
 			<span class="red">#addCanalMessage ($canalParameterGroup.connectionCharset)</span>
 		</td>
       </tr>
+          <tr>
+
+              <th width="300">显示binlog列表</th>
+              <td width="329">
+                  <input type="button" value="查看binlog文件列表" onclick="listBinlog()" />
+                  <br> <span class="red" id="result"></span>
+              </td>
+          </tr>
 	  #**
 	  <tr class="mysqlSourcing"> 
         <th width="300">链接到mysql的slaveId：</th>

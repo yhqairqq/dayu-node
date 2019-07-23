@@ -75,6 +75,7 @@ public class PipelineParameter implements Serializable {
     private Boolean               dryRun                     = false;                       // 是否启用dry
                                                                                              // run模型，只记录load日志，不同步数据
     private Boolean               ddlSync                    = true;                        // 是否支持ddl同步
+    private Boolean               dataSyncSkip               = false;                       //数据同步跳过
     private Boolean               skipDdlException           = false;                       // 是否跳过ddl执行异常
 
     // ================================= channel parameter
@@ -237,6 +238,15 @@ public class PipelineParameter implements Serializable {
             return this.equals(SelectorMode.Canal);
         }
 
+    }
+
+    public Boolean getDataSyncSkip() {
+        // return passChange==null? true:passChange;
+        return dataSyncSkip == null?true:dataSyncSkip;
+    }
+
+    public void setDataSyncSkip(Boolean dataSyncSkip) {
+        this.dataSyncSkip = dataSyncSkip;
     }
 
     // ======================== setter / getter ===========================

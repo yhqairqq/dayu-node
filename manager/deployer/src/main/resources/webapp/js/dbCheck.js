@@ -22,6 +22,13 @@ function checkTablesPrimaryKey(){
 
     Hello.checkTablesPrimaryKey(namespace, name, dataSourceId, callback);
 }
+
+function listBinlog() {
+    var username = document.getElementById('username').value;
+    var password = document.getElementById('password').value;
+    var url = document.getElementById('url').value;
+    Hello.listBinlog(url,username,password,callback)
+}
   
 function callback(msg) {  
     DWRUtil.setValue('result', msg);  
