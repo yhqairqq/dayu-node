@@ -20,6 +20,9 @@ public class IdMergeCityIdProcessor extends AbstractEventProcessor {
                 fixId  = fixId + eventColumn.getColumnValue();
             }
         }
+        if("".equals(fixId)){
+            return true;
+        }
 
         if(!CollectionUtils.isEmpty(keys)){
             if(eventData.getEventType() == EventType.INSERT || eventData.getEventType() == EventType.UPDATE || eventData.getEventType() == EventType.DELETE ){

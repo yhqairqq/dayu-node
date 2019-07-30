@@ -109,8 +109,10 @@ $control.setTemplate("home:navigation.vm")
   <tr class="super"> 
   <th>dryRun模式：</th><td>#if($!pipeline.parameters.isDryRun()) 开启 #else 关闭 #end</td>
   </tr>
-  <tr class="super"> 
-  <th>支持ddl同步：</th><td>#if($!pipeline.parameters.ddlSync) 开启 #else 关闭 #end</td>
+ <tr class="super">
+     <th>跳过数据：</th><td>#if($!pipeline.parameters.dataSyncSkip) 开启 #else 关闭 #end</td>
+ <tr class="super">
+  <th>支持ddl同步：</th><td>#if($!pipeline.parameters.dataSyncSkip) 开启 #else 关闭 #end</td>
   </tr>
   <tr class="super"> 
   <th>跳过ddl异常：</th><td>#if($!pipeline.parameters.skipDdlException) 开启 #else 关闭 #end</td>

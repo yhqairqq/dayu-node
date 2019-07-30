@@ -1,5 +1,6 @@
 package com.alibaba.otter.manager.biz.common.alarm;
 
+
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
@@ -14,8 +15,8 @@ import org.apache.http.util.EntityUtils;
 public class DingDingAlarmService extends AbstractAlarmService {
 
     private   String webhook ;
-    private  HttpClient httpclient = HttpClients.createDefault();
-    private  HttpPost httppost ;
+    private HttpClient httpclient = HttpClients.createDefault();
+    private HttpPost httppost ;
 
     public void init(){
         httppost = new HttpPost(webhook);

@@ -18,6 +18,7 @@ package com.alibaba.otter.node.etl.select.selector;
 
 import java.util.*;
 
+import com.alibaba.otter.canal.parse.inbound.ParserExceptionHandler;
 import com.alibaba.otter.node.etl.extract.exceptions.ExtractException;
 import com.alibaba.otter.shared.common.model.config.data.mq.MqDataMedia;
 import org.apache.commons.lang.StringUtils;
@@ -362,6 +363,7 @@ public class MessageParser {
                         schemaName,
                         tableName,
                         notExistReturnNull);
+
                 // 如果EventType是CREATE/ALTER，需要reload
                 // DataMediaInfo;并且把CREATE/ALTER类型的事件丢弃掉.
                 if (dataMedia != null && (eventType.isCreate() || eventType.isAlter() || eventType.isRename())) {
@@ -380,6 +382,9 @@ public class MessageParser {
                     eventData.setExecuteTime(entry.getHeader().getExecuteTime());
                     eventData.setSql(rowChange.getSql());
                     eventData.setDdlSchemaName(rowChange.getDdlSchemaName());
+                    if(dataMedia == null){
+                        throw new SelectException("dataMedia is null ,"+"eventData:"+eventData+",pipline:"+pipeline);
+                    }
                     eventData.setTableId(dataMedia.getId());
                     return Arrays.asList(eventData);
                 } else {

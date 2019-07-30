@@ -53,6 +53,13 @@ mysql -hdb-prod00-caicai-2 -usync -pNuhEL2@p90BT
 汇总
 mysql -hdb-prod-caicai-mg -usync -pNuhEL2@p90BT
 
+芜湖主
+mysql -hdb-prod00-caicai-3 -usync -pNuhEL2@p90BT
+芜湖从
+mysql -hdb-prod01-caicai-3 -usync -pNuhEL2@p90BT
+
+db-prod-erp-1    erp_admin  xuc8dHr#s^4N7O
+
 
 caicai 备份
 mysql -hdb-prod01-caicai-1 -usync -pNuhEL2@p90BT
@@ -111,3 +118,7 @@ global：数据库地址：rm-bp10p2vl5x3c4mum5160.mysql.rds.aliyuncs.com
 
 源库：数据库地址rm-bp10p2vl5x3c4mum5160.mysql.rds.aliyuncs.com
 数据库|用户名|密码：caicai caicai 123!@#qwe      全量同步，包括所有表
+
+
+上传jar
+ mvn deploy:deploy-file -DgroupId=com.alibaba.otter -DartifactId=canal.instance.manager -Dversion=1.1.2 -Dpackaging=jar -Dfile=/Users/YHQ/workspace/canal/instance/manager/target/canal.instance.manager-1.1.2.jar -DrepositoryId=thirdparty -Durl=http://admin:admin123@maven.caicaivip.com/nexus/content/repositories/thirdparty/

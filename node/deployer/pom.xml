@@ -11,7 +11,7 @@
 	<packaging>jar</packaging>
 	<name>node deployer for otter</name>
 	<url>http://github.com/alibaba/otter</url>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>com.alibaba.otter</groupId>
@@ -37,8 +37,18 @@
 			<groupId>com.alibaba.fastsql</groupId>
 			<artifactId>fastsql</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.aliyun</groupId>
+			<artifactId>aliyun-java-sdk-core</artifactId>
+			<version>3.7.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.aliyun</groupId>
+			<artifactId>aliyun-java-sdk-ecs</artifactId>
+			<version>4.11.0</version>
+		</dependency>
 	</dependencies>
-	
+
 	<build>
 		<plugins>
 			<!-- deploy模块的packaging通常是jar，如果项目中没有java 源代码或资源文件，加上这一段配置使项目能通过构建 -->
@@ -129,7 +139,7 @@
 				</plugins>
 			</build>
 		</profile>
-		
+
 		<profile>
 			<id>mvn</id>
 			<activation>

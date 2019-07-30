@@ -9,3 +9,7 @@ show binlog events in 'mysql-bin.000001';
  mysqlbinlog -hrm-bp10p2vl5x3c4mum5160.mysql.rds.aliyuncs.com -ucaicai_dev -p123!@#qwe --read-from-remote-server --start-datetime="2019-07-09 14:30:58" --stop-datetime="2019-07-09 14:47:00" mysql-bin.000965 >/data/server/b.log
 
 mysqlbinlog -hrm-bp10p2vl5x3c4mum5160.mysql.rds.aliyuncs.com -ucaicai_dev -p'123!@#qwe' --read-from-remote-server --start-datetime="2019-07-21 17:10:37" --stop-datetime="2019-07-21 17:53:37" mysql-bin.001100 >/root/aa.log
+
+mysqlbinlog -hrm-bp10p2vl5x3c4mum5160.mysql.rds.aliyuncs.com -ucaicai -p'123!@#qwe' --read-from-remote-server mysql-bin.001124 >/root/mysql-bin.001124
+
+

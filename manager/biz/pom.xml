@@ -11,6 +11,9 @@
 	<packaging>jar</packaging>
 	<name>manager biz module for otter</name>
 	<url>http://github.com/alibaba/otter</url>
+	<properties>
+		<otter_canal_instance_manager>1.1.2.2-SNAPSHOT</otter_canal_instance_manager>
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -31,7 +34,7 @@
 		<dependency>
 			<groupId>com.alibaba.otter</groupId>
 			<artifactId>canal.instance.manager</artifactId>
-			<version>${otter_canal_version}</version>
+			<version>${otter_canal_instance_manager}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.springframework</groupId>
@@ -134,6 +137,26 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.5</version>
+		</dependency>
+		<dependency>
+			<groupId>com.aliyun</groupId>
+			<artifactId>aliyun-java-sdk-core</artifactId>
+			<version>3.7.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.aliyun</groupId>
+			<artifactId>aliyun-java-sdk-ecs</artifactId>
+			<version>4.11.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba.otter</groupId>
+			<artifactId>canal.parse</artifactId>
+			<version>1.1.2.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>

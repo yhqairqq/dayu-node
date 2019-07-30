@@ -20,7 +20,7 @@
 		<dependency>
 			<groupId>com.alibaba.otter</groupId>
 			<artifactId>canal.instance.manager</artifactId>
-			<version>${otter_canal_version}</version>
+			<version>${otter_canal_instance_manager}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.springframework</groupId>
@@ -31,7 +31,7 @@
 		<dependency>
 			<groupId>com.alibaba.otter</groupId>
 			<artifactId>canal.parse</artifactId>
-			<version>${otter_canal_version}</version>
+			<version>${otter_canal_instance_parser}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.springframework</groupId>
@@ -50,7 +50,7 @@
 				</exclusion>
 				<exclusion>
 					<groupId>org.apache.kafka</groupId>
-					<artifactId>kafka_2.11</artifactId>				
+					<artifactId>kafka_2.11</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
