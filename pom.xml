@@ -54,19 +54,20 @@
 
 	<repositories>
 
-		<repository>
-			<id>central</id>
-			<url>http://repo1.maven.org/maven2</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
+		<!--<repository>-->
+			<!--<id>central</id>-->
+			<!--<url>http://repo1.maven.org/maven2</url>-->
+			<!--<releases>-->
+				<!--<enabled>true</enabled>-->
+			<!--</releases>-->
+			<!--<snapshots>-->
+				<!--<enabled>false</enabled>-->
+			<!--</snapshots>-->
+		<!--</repository>-->
 		<repository>
 			<id>nexus</id>
-			<url>http://maven.caicaivip.com/nexus/content/groups/public/</url>
+			<url>http://
+				maven.caicaivip.com/nexus/service/local/repositories/releases/content/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -85,17 +86,17 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-		<repository>
-			<id>jtester-maven</id>
-			<name>JTester</name>
-			<url>http://jtester.googlecode.com/svn/m2/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
+		<!--<repository>-->
+			<!--<id>jtester-maven</id>-->
+			<!--<name>JTester</name>-->
+			<!--<url>http://jtester.googlecode.com/svn/m2/</url>-->
+			<!--<releases>-->
+				<!--<enabled>true</enabled>-->
+			<!--</releases>-->
+			<!--<snapshots>-->
+				<!--<enabled>false</enabled>-->
+			<!--</snapshots>-->
+		<!--</repository>-->
 		<repository>
 			<id>sonatype</id>
 			<name>sonatype</name>

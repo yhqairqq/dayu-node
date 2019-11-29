@@ -67,6 +67,12 @@
 			<ref bean="dataMediaSourceDao" />
 		</property>
 	</bean>
+
+	<bean id="dbDiff" class="com.alibaba.otter.manager.biz.utils.DbDiff">
+			<property name="dataSourceCreator">
+				<ref bean="dataSourceCreator" />
+			</property>
+	</bean>
 	
 	<bean id="nodeService" class="com.alibaba.otter.manager.biz.config.node.impl.NodeServiceImpl">
 		<property name="nodeDao">
@@ -178,12 +184,19 @@
 		<property name="dataSourceCreator">
 			<ref bean="dataSourceCreator" />
 		</property>
+		<property name="dbDiff">
+			<ref bean="dbDiff" />
+		</property>
+		<property name="pipelineService">
+			<ref bean="pipelineService" />
+		</property>
 		<dwr:remote javascript="Hello">
 			<dwr:include method="check" />
 			<dwr:include method="checkMap" />
 			<dwr:include method="checkNamespaceTables" />
 			<dwr:include method="checkTablesPrimaryKey" />
 			<dwr:include method="listBinlog" />
+			<dwr:include method="compareRecord" />
 		</dwr:remote>
 	</bean>
 	

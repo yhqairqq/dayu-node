@@ -1,7 +1,11 @@
 $control.setTemplate("home:navigation.vm")
 #set($user = $rundata.request.session.getAttribute("managerUser"))
 <script type="text/javascript" src="js/trcolor.js"></script>
-<script type="text/javascript" src="js/jquery-1.4.2.min.js"></script> 
+<script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
+<script type='text/javascript' src='dwr/interface/Hello.js'></script>
+<script type='text/javascript' src='dwr/engine.js'></script>
+<script type='text/javascript' src='dwr/util.js'></script>
+<script type='text/javascript' src='js/dbCheck.js'></script>
 <script language="javascript">
     <!--
 	changeNav("sync");
@@ -70,6 +74,8 @@ $control.setTemplate("home:navigation.vm")
     <h2>Pipeline管理</h2>
   </div>
   <div class="crumbs"><a href="channelList.htm?channelId=$channel.id">channel管理</a>&nbsp;&nbsp;>&nbsp;&nbsp;<a href="pipelineList.htm?channelId=$channel.id">Pipeline管理</a></div>
+
+
   <div class="crumbs"></div>     
 <!--列表-->
  
@@ -122,6 +128,7 @@ $control.setTemplate("home:navigation.vm")
 	  <td width="8%">$!numberFormat.format($!positionData.modifiedTime)</td>
 	  <td width="3%">$alarmRuleStats.get($pipeline.id).size()</td>
 	  <td>
+          <a href="javascript:compareRecord($pipeline.id);"><img src="images/ico_edit.png" width="13" height="13" /><span class="ico_font">数据对比</span><span class="red" id="result_$pipeline.id" ></span></a>
 		#set ($pipelineInfoURL = $homeModule.setTarget("pipelineInfo.vm").addQueryData("pipelineId", $pipeline.id))
 		<a href="$pipelineInfoURL"><img src="images/ico_edit.png" width="13" height="13" /><span class="ico_font">查看</span></a>
 		#set ($monitorURL = $homeModule.setTarget("alarmRuleList.vm").addQueryData("pipelineId", $pipeline.id).addQueryData("channelId", $channel.id))
@@ -149,11 +156,12 @@ $control.setTemplate("home:navigation.vm")
     </tr>
 		  #end
         </table>
+    <span class="red" id="result" />
 		#if($user.authorizeType.isAdmin() && $channel.status.isStop() && $channel.pipelines.size() < 2 )
         		<div class="btn">
         			#set ($addURL = $homeModule.setTarget("addPipeline.vm").addQueryData("channelId", $channel.id))
         			<a href="$addURL">添加</a>
         		</div>
         #end
-        
+
 </div>

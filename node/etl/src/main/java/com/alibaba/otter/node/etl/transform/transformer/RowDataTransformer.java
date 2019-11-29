@@ -56,9 +56,7 @@ public class RowDataTransformer extends AbstractOtterTransformer<EventData, Even
         EventData result = new EventData();
 
         //如果传递就
-        if(context.getPipeline().getParameters().getPassChange() &&
-                (context.getDataMediaPair().getTarget().getSource().getType().isKafka() ||
-                context.getDataMediaPair().getTarget().getSource().getType().isRocketMq())){
+        if(context.getPipeline().getParameters().getPassChange()){
             result.setBefore(data.getBefore());
             result.setAfter(data.getAfter());
         }

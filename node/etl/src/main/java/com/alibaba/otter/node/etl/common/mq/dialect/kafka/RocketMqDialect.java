@@ -104,6 +104,7 @@ public class RocketMqDialect implements MqDialect<DefaultMQProducer> {
         producer1.setProducerGroup("Otter_sendBinlogErp");
         producer1.setNamesrvAddr("10.111.31.224:9876");
         producer1.setInstanceName("kk2");
+
         producer1.start();
         Message msg1 = new Message("topic2", "sink_d","121212", "你好".getBytes(RemotingHelper.DEFAULT_CHARSET)// body
         );

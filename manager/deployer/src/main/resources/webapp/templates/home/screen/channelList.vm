@@ -1,8 +1,8 @@
 $control.setTemplate("home:navigation.vm")
 #set($user = $rundata.request.session.getAttribute("managerUser"))
 <script type="text/javascript" src="js/trcolor.js"></script>
-<script type="text/javascript" src="js/jquery-1.4.2.min.js"></script> 
-<script type="text/javascript" src="js/jquery.simplemodal-1.4.js"></script> 
+<script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="js/jquery.simplemodal-1.4.js"></script>
 <script language="javascript">
 <!--
 	changeNav("sync");
@@ -61,9 +61,9 @@ $control.setTemplate("home:navigation.vm")
             });
         });
     });
-    
+
     //-->
-		
+
 </script>
 
 <!--页面主体-->
@@ -71,16 +71,16 @@ $control.setTemplate("home:navigation.vm")
    <div class="title">
     <h2>Channel管理</h2>
   </div>
-   <div class="crumbs"><a href="channelList.htm">Channel管理</a></div> 
-   
+   <div class="crumbs"><a href="channelList.htm">Channel管理</a></div>
+
    <!--分页表单-->
    <form id="pageform" name="pageform" action="$homeModule.setTarget('channelList.vm')" method="post">
     	<input type="hidden" id="pageIndex" name="pageIndex" value=""/>
 		<input type="hidden" id="searchKey" name="searchKey" value="$!searchKey"/>
    </form>
-   
+
    <!--Channel搜索-->
-   <div class="search_o"> 
+   <div class="search_o">
 		<form name="search_channel" action="channelList.htm" method="post">
 			##$csrfToken.hiddenField
 			<div class="search_input">
@@ -90,24 +90,24 @@ $control.setTemplate("home:navigation.vm")
         </form>
    </div>
    <!--列表-->
-    
+
   <table border="0" cellspacing="0" cellpadding="0" class="list changecolor_w">
-    <tr> 
+    <tr>
       <th>序号</th>
       <th>Channel名字</th>
       <th>运行状态</th>
 	  <th>同步方向</th>
 	  <th>操作</th>
     </tr>
-    
+
     #foreach ($channel in $channels)
-		<tr> 
+		<tr>
 	      <td width="5%">$channel.id</td>
 	      <td width="16%">
 			#set ($pipelineURL = $homeModule.setTarget("pipelineList.vm").addQueryData("channelId", $channel.id))
 			<a href="$pipelineURL" id="download" class="trigger">$channel.name</a>
 	      </td>
-	      
+
 	      	<td>
                 #if($channel.status.isStart())  <a href="" style="color:green">运行</a>
                 #elseif($channel.status.isPause())  <a href="" style="color:red">挂起</a>
@@ -115,17 +115,18 @@ $control.setTemplate("home:navigation.vm")
 				#end
 			</td>
 	      <td>
-				#if($channel.pipelines.size() == 0) 无 
+				#if($channel.pipelines.size() == 0) 无
 				#elseif($channel.pipelines.size() == 1) 单向
 				#elseif($channel.pipelines.size() == 2) 双向
 				#end
 			</td>
-	     
-		  
+
+
 		  <td><p>
         				#set ($channelInfoURL = $homeModule.setTarget("channelInfo.vm").addQueryData("channelId", $channel.id))
+
 						<a href="$channelInfoURL"><img src="images/ico_edit.png" width="13" height="13" /><span class="ico_font">查看</span></a>
-						
+
 						#set ($notifyURL = $homeModule.setAction("channelAction").addQueryData("channelId", $channel.id).addQueryData("pageIndex", $paginator.page).addQueryData("searchKey", $!searchKey).addQueryData("eventSubmitDoNotify", "true").render())
     					#if($user.authorizeType.isAdmin())
 							#if($channel.status.isStart() || $channel.status.isPause())
@@ -146,7 +147,7 @@ $control.setTemplate("home:navigation.vm")
 										#elseif($num == 2)
 											#set($flag_back = true)
 										#end
-										
+
 									#end
 									#set($num = 2)
 								#end
@@ -154,11 +155,11 @@ $control.setTemplate("home:navigation.vm")
 									#set($sflag_go = false)
 									#set($eflag_go = false)
 									#set($lflag_go = false)
-									
+
 									#set($sflag_back = false)
 									#set($eflag_back = false)
 									#set($lflag_back = false)
-									
+
 									#set($num = 1)
 									#foreach($pipeline in $channel.pipelines)
 										#foreach($selectNode in $pipeline.selectNodes)
@@ -190,7 +191,7 @@ $control.setTemplate("home:navigation.vm")
 										#end
 										#set($num = 2)
 									#end
-									
+
 									#if($channel.pipelines.size() == 1)
 										#set($flag = $flag_go)
 										#set($sflag = $sflag_go)
@@ -202,7 +203,7 @@ $control.setTemplate("home:navigation.vm")
 										#set($eflag = $eflag_go && $eflag_back)
 										#set($lflag = $lflag_go && $lflag_back)
 									#end
-									
+
 								#if($channel.status.isStop())
 									#if($flag)
 										#if($sflag && $eflag && $lflag)
@@ -221,11 +222,11 @@ $control.setTemplate("home:navigation.vm")
 										#else
 											<span class="ico_line">|</span><img src="images/ico_edit.png" width="13" height="13" /><span class="ico_font" title="映射关系没有配置，不能启动">启用</span>
 										#end
-										
+
 									#end
-									
+
 								#end
-								
+
 								#if($flag && $channel.status.isPause())
 									#if($sflag && $eflag && $lflag)
 										#if($channel.processEmpty)
@@ -244,9 +245,9 @@ $control.setTemplate("home:navigation.vm")
 									#set ($editURL = $homeModule.setTarget("editChannel.vm").addQueryData("channelId", $channel.id).addQueryData("pageIndex", $!paginator.page).addQueryData("searchKey", $!searchKey))
     								<span class="ico_line">|</span><a href="$editURL"><img src="images/ico_edit.png" width="13" height="13" /><span class="ico_font">编辑</span></a>
 								#end
-								
+
 								<span class="ico_line">|</span><a href="javascript:if(confirm('确实推送Channel吗?'))location='$notifyURL'"><img src="images/ico_edit.png" width="13" height="13" /><span class="ico_font">推送</span></a>
-								
+
 								#if($delFlag)
     								<span class="ico_line">|</span><img src="images/ico_del.png" width="9" height="9"  /><span class="ico_font" title="channel必须不包含pipeline才能执行删除">删除</span>
 								#else
@@ -258,24 +259,24 @@ $control.setTemplate("home:navigation.vm")
     	  </p></td>
 	    </tr>
 	#end
-  
-    
-    
+
+
+
   </table>
   <!--常规按钮-->
 	  #if($user.authorizeType.isAdmin())
 		<div class="btn"><a href="$channelAddLink">添加</a></div>
 	  #end
-      
+
      <!--分页-->
-     <div class="page">共$paginator.items条数据&nbsp;&nbsp;第$paginator.page页/共$paginator.pages页&nbsp;&nbsp; 
-       
+     <div class="page">共$paginator.items条数据&nbsp;&nbsp;第$paginator.page页/共$paginator.pages页&nbsp;&nbsp;
+
 	   #if($paginator.page == 1)
             <font color="999999">首页</font>
 	   #else
 			<a href="#" class="prev" onclick="pageNavigation(this,1)">首页</a>
 	   #end
-	   
+
 	   #if($paginator.page > 1)
 			#set($pre_page = $paginator.page - 1)
 				<a href="#" class="prev" onclick="pageNavigation(this,$pre_page)">上一页</a>
@@ -289,24 +290,24 @@ $control.setTemplate("home:navigation.vm")
                 <b>$thisPage</b>
 			#else
 				#if($thisPage != 0)
-					<a href="#" class="num" onclick="pageNavigation(this,$thisPage)">$thisPage</a> 
+					<a href="#" class="num" onclick="pageNavigation(this,$thisPage)">$thisPage</a>
 				#end
 			#end
 	   #end
-	   
+
 	   #if($paginator.page < $paginator.pages)
 			#set($next_page = $paginator.page + 1)
 				<a href="#" class="prev" onclick="pageNavigation(this,$next_page)">下一页</a>
 	   #else
             <font color="999999">下一页</font>
 	   #end
-	   
+
 	   #if($paginator.page == $paginator.pages)
             <font color="999999">末页</font>
 	   #else
 			<a href="#" class="prev" onclick="pageNavigation(this,$paginator.pages)">末页</a>
 	   #end
-     </div>    
+     </div>
 </div>
 
 <script language="javascript">

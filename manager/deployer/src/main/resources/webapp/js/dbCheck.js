@@ -29,9 +29,12 @@ function listBinlog() {
     var url = document.getElementById('url').value;
     Hello.listBinlog(url,username,password,callback)
 }
+function compareRecord(piplineId){
+    Hello.compareRecord(piplineId,callback)
+}
   
-function callback(msg) {  
-    DWRUtil.setValue('result', msg);  
+function callback(msg) {
+    DWRUtil.setValue('result', msg);
 }
 
 function checkNamespaceTables() {  

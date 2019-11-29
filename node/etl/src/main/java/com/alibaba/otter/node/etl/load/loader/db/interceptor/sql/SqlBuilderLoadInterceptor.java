@@ -16,12 +16,10 @@
 
 package com.alibaba.otter.node.etl.load.loader.db.interceptor.sql;
 
-import com.alibaba.otter.node.common.config.ConfigClientService;
 import com.alibaba.otter.node.etl.common.db.dialect.DbDialect;
 import com.alibaba.otter.node.etl.common.db.dialect.DbDialectFactory;
 import com.alibaba.otter.node.etl.common.db.dialect.SqlTemplate;
 import com.alibaba.otter.node.etl.common.db.dialect.oracle.OracleSqlTemplate;
-import com.alibaba.otter.node.etl.load.loader.AbstractLoadContext;
 import com.alibaba.otter.node.etl.load.loader.db.context.DbLoadContext;
 import com.alibaba.otter.node.etl.load.loader.interceptor.AbstractLoadInterceptor;
 import com.alibaba.otter.shared.common.model.config.data.db.DbMediaSource;

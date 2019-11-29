@@ -30,7 +30,7 @@ import com.alibaba.otter.shared.common.utils.OtterToStringStyle;
 
 /**
  * 每条变更数据.
- * 
+ *
  * @author xiaoqing.zhouxq 2011-8-9 下午03:42:20
  */
 public class EventData implements ObjectData, Serializable {
@@ -55,6 +55,11 @@ public class EventData implements ObjectData, Serializable {
      * 变更数据的业务时间.
      */
     private long              executeTime;
+
+    /**
+     * 持久化发送时间
+     */
+    private long               loadTime;
 
     /**
      * 变更前的主键值,如果是insert/delete变更前和变更后的主键值是一样的.
@@ -124,6 +129,14 @@ public class EventData implements ObjectData, Serializable {
      * @return
      */
     private String topic;
+
+    public long getLoadTime() {
+        return loadTime;
+    }
+
+    public void setLoadTime(long loadTime) {
+        this.loadTime = loadTime;
+    }
 
     /**
      * 分片或者tag

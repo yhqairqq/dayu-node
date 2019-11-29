@@ -488,6 +488,9 @@ public class MqLoadAction implements InitializingBean, DisposableBean {
         }
 
         private void doSent(final EventData eventData) throws Exception {
+            eventData.setLoadTime(System.currentTimeMillis());
+            //mq清空Cloumns
+            eventData.getColumns().clear();
             if (mqDialect instanceof KafkaDialect) {
                 Producer producer = (Producer) mqDialect.getProducer();
                 send(eventData, producer);

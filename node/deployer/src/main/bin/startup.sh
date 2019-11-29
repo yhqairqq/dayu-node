@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 current_path=`pwd`
 case "`uname`" in
@@ -19,7 +19,7 @@ if [ -f $base/bin/otter.pid ] ; then
     exit 1
 fi
 
-if [ ! -d $base/logs/node ] ; then 
+if [ ! -d $base/logs/node ] ; then
 	mkdir -p $base/logs/node
 fi
 
@@ -30,7 +30,7 @@ fi
 if [ -z "$ARIA2C" ]; then
 	source $HOME/.bash_profile
 	ARIA2C=$(which aria2c)
-	
+
 	if [ -z "$ARIA2C" ]; then
 		echo "Cannot find a aria2c. Please set in your PATH in .bash_profile." 2>&2
 		#exit 1;
@@ -55,37 +55,39 @@ if [ -z "$JAVA" ]; then
   fi
 fi
 
-case "$#" 
+case "$#"
 in
-0 ) 
+0 )
 	;;
-1 )	
+1 )
 	var=$*
-	if [ -d $var ] 
-	then 
+	if [ -d $var ]
+	then
 		otterNodeIdFile=$var
         logback_configurationFile=$base/conf/logback.xml
-	elif [ -f $var ] ; then 
+	elif [ -f $var ] ; then
 		otterNodeIdFile=$base/conf/nid
         logback_configurationFile=$var
 	else
 		echo "THE PARAMETER IS NOT CORRECT.PLEASE CHECK AGAIN."
         exit
 	fi;;
-2 )	
+2 )
 	var1=$1
 	var2=$2
 	if [ -d $var1 -a -f $var2 ] ; then
 		otterNodeIdFile=$var1
 		logback_configurationFile=$var2
-	elif [ -d $var2 -a -f $var1 ] ; then  
+	elif [ -d $var2 -a -f $var1 ] ; then
 		otterNodeIdFile=$var2
 		logback_configurationFile=$var1
-	else 
+	else
 		if [ "$1" = "debug" ]; then
 			DEBUG_PORT=$2
 			DEBUG_SUSPEND="n"
-			JAVA_DEBUG_OPT="-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=$DEBUG_PORT,server=y,suspend=$DEBUG_SUSPEND"
+			JAVA_DEBUG_OPT="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=$DEBUG_PORT"
+#			JAVA_DEBUG_OPT="-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=$DEBUG_PORT,server=y,suspend=$DEBUG_SUSPEND"
+
 		fi
      fi;;
 * )
@@ -95,33 +97,33 @@ esac
 
 str=`file $JAVA | grep 64-bit`
 if [ -n "$str" ]; then
-	JAVA_OPTS="-server -Xms4g -Xmx4g -Xmn2g -XX:SurvivorRatio=2   -Xss256k -XX:-UseAdaptiveSizePolicy -XX:MaxTenuringThreshold=15 -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:+UseCMSCompactAtFullCollection -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:+HeapDumpOnOutOfMemoryError"
+	JAVA_OPTS="-server -Xms4g -Xmx4g -Xmn2g -XX:SurvivorRatio=2   -Xss256k -XX:-UseAdaptiveSizePolicy -XX:MaxTenuringThreshold=15 -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled  -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:+HeapDumpOnOutOfMemoryError"
 else
-	JAVA_OPTS="-server -Xms4g -Xmx4g -Xmn2g -XX:SurvivorRatio=2   -Xss256k -XX:-UseAdaptiveSizePolicy -XX:MaxTenuringThreshold=15 -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:+UseCMSCompactAtFullCollection -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:+HeapDumpOnOutOfMemoryError"
+	JAVA_OPTS="-server -Xms4g -Xmx4g -Xmn2g -XX:SurvivorRatio=2   -Xss256k -XX:-UseAdaptiveSizePolicy -XX:MaxTenuringThreshold=15 -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled  -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:+HeapDumpOnOutOfMemoryError"
 fi
 
 JAVA_OPTS=" $JAVA_OPTS -Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -Dfile.encoding=UTF-8"
 OTTER_OPTS="-DappName=otter-node -Ddubbo.application.logger=slf4j -Dlogback.configurationFile=$logback_configurationFile -Dnid=$(cat $otterNodeIdFile)"
 
 if [ -e $otterNodeIdFile -a -e $logback_configurationFile ]
-then 
+then
 	for i in $base/lib/*;
 	do CLASSPATH=$i:"$CLASSPATH";
 	done
 	CLASSPATH="$base/conf:$CLASSPATH";
- 
+
 	echo LOG CONFIGURATION : $logback_configurationFile
-	echo Otter nodeId file : $otterNodeIdFile 
+	echo Otter nodeId file : $otterNodeIdFile
 	echo CLASSPATH :$CLASSPATH
 
   echo "cd to $bin_abs_path for workaround relative path"
   cd $bin_abs_path
 
 	$JAVA $JAVA_OPTS $JAVA_DEBUG_OPT $OTTER_OPTS -classpath .:$CLASSPATH com.alibaba.otter.node.deployer.OtterLauncher 1>>$base/logs/node/node.log 2>&1 &
-	echo $! > $base/bin/otter.pid 
+	echo $! > $base/bin/otter.pid
 
   echo "cd to $current_path for continue"
   cd $current_path
-else 
+else
 	echo "otterNodeIdFile file("$otterNodeIdFile") OR log configration file($logback_configurationFile) is not exist,please create then first!"
 fi

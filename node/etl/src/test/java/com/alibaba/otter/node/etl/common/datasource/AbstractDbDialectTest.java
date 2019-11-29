@@ -18,6 +18,7 @@ package com.alibaba.otter.node.etl.common.datasource;
 
 import javax.sql.DataSource;
 
+import com.alibaba.otter.shared.common.model.config.pipeline.Pipeline;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ddlutils.model.Column;
@@ -30,19 +31,19 @@ import com.alibaba.otter.shared.common.utils.meta.DdlUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.LockSupport;
 
 /**
  * 类TestAbstractDbDialect.java的实现描述：TODO 类实现描述
  *
  * @author xiaoqing.zhouxq 2011-12-9 下午3:03:55
+ *
+ * mybatis 数据插入例子
  */
 public class AbstractDbDialectTest {
 
+     private static ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
     @Test
     public void testFindTable() throws Exception {
         DataSource dataSource = createDataSource("jdbc:oracle:thin:@127.0.0.1:1521:OINTEST", "otter1", "jonathan",
@@ -65,62 +66,43 @@ public class AbstractDbDialectTest {
 //        DataSource dataSource1 = createDataSource("jdbc:mysql://172.16.10.68:3306/aky1", "root", "123456",
 //                "com.mysql.jdbc.Driver", DataMediaType.MYSQL, "utf-8");
         JdbcTemplate jdbcTemplate0 = new JdbcTemplate(dataSource0);
-        String sql0 = "insert into `otter_sink`.`source_a` ( `f4`, `name`, `city_id`, `f5`) values ( ?, ?, ?, ?)";
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
-
-//        MetaDataConfig metaDataConfig0 = new MetaDataConfig();
-//        metaDataConfig0.setStatus(0);
-//        metaDataConfig0.setGmtTime(new Date());
-//        metaDataConfig0.setModifyTime(new Date());
-//        metaDataConfig0.setCatlog("0");
-//        metaDataConfig0.setDbType("mysql");
-//        metaDataConfig0.setIp("172.16.10.68");
-//        metaDataConfig0.setSchemaName("aky");
-//        metaDataConfig0.setTableName("metadata");
-//        jdbcTemplate0.update(sql0,
-//                metaDataConfig0.getStatus(),
-//                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
-//                metaDataConfig0.getCatlog(),
-//                metaDataConfig0.getDbType(),
-//                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
-//                metaDataConfig0.getTableName(),
-//                metaDataConfig0.getIp(),
-//                metaDataConfig0.getSchemaName()
-//                );
-
-//        MetaDataConfig metaDataConfig1 = new MetaDataConfig();
-//        metaDataConfig1.setStatus(1);
-//        metaDataConfig1.setGmtTime(new Date());
-//        metaDataConfig1.setModifyTime(new Date());
-//        metaDataConfig1.setCatlog("1");
-//        metaDataConfig1.setDbType("mysql");
-//        metaDataConfig1.setIp("172.16.10.68");
-//        metaDataConfig1.setSchemaName("aky");
-//        metaDataConfig1.setTableName("metadata");
-//        JdbcTemplate jdbcTemplate1 = new JdbcTemplate(dataSource1);
-        int threadSize = 2;
-        int recordSize = 100000;
-        int unitRecordSize = recordSize/2;
-        for(int i=0;i<threadSize;i++){
-             int finalI = i;
-            executorService.submit(new Runnable() {
-                 @Override
-                 public void run() {
-                     for(int start = finalI *unitRecordSize;start < unitRecordSize*(finalI+1);start++){
-                         // ( `f4`, `name`, `city_id`, `f5`)
-                         jdbcTemplate0.update(sql0,
-                                 "name"+start,
-                                 "name"+start,
-                                 start,
-                                 start
-                         );
-
-//                         System.out.println(Thread.currentThread().getName()+":"+start);
-                     }
-                 }
-             });
-        }
-        System.out.println(jdbcTemplate0);
+        String sql0 = "insert into `otter_sink`.`source_a` (  `name`, `city_id`,`f4`, `f5`) values ( ?, ?, ?,?)";
+//        ExecutorService executorService = Executors.newFixedThreadPool(4);
+        final long[] i = {0};
+        executorService.scheduleAtFixedRate(new Runnable() {
+            public void run() {
+                jdbcTemplate0.update(sql0,
+                        "name"+i[0]++,
+                        i[0],
+                        "f4"+i[0],
+                        i[0]
+                );
+            }
+        }, 30, 30, TimeUnit.SECONDS);
+//        int threadSize = 2;
+//        int recordSize = 100000;
+//        int unitRecordSize = recordSize/2;
+//        for(int i=0;i<threadSize;i++){
+//             int finalI = i;
+//            executorService.submit(new Runnable() {
+//                 @Override
+//                 public void run() {
+//                     for(int start = finalI *unitRecordSize;start < unitRecordSize*(finalI+1);start++){
+//                         // ( `f4`, `name`, `city_id`, `f5`)
+//                         jdbcTemplate0.update(sql0,
+//                                 "name"+start,
+//                                 "name"+start,
+//                                 start,
+//                                 start,
+//                                 start
+//                         );
+//
+////                         System.out.println(Thread.currentThread().getName()+":"+start);
+//                     }
+//                 }
+//             });
+//        }
+//        System.out.println(jdbcTemplate0);
 
 //        System.out.println(jdbcTemplate1);
     }

@@ -21,6 +21,7 @@ import java.util.*;
 import com.alibaba.otter.canal.parse.inbound.ParserExceptionHandler;
 import com.alibaba.otter.node.etl.extract.exceptions.ExtractException;
 import com.alibaba.otter.shared.common.model.config.data.mq.MqDataMedia;
+import com.alibaba.otter.shared.common.utils.Assert;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ddlutils.model.Table;
 import org.slf4j.Logger;
@@ -542,8 +543,11 @@ public class MessageParser {
                 }
             }
         } else if (eventType.isUpdate()) {
+            Map<String,Column> beforeColumnMap = new HashMap<>(beforeColumns.size());
             // 获取变更前的主键.
             for (Column column : beforeColumns) {
+                //记录下
+                beforeColumnMap.put(column.getName(),column);
                 if (isKey(tableHolder, tableName, column)) {
                     oldKeyColumns.put(column.getName(), copyEventColumn(column, true, tableHolder));
                     // 同时记录一下new
@@ -569,6 +573,14 @@ public class MessageParser {
                     boolean isUpdate = true;
                     if (entry.getHeader().getSourceType() == CanalEntry.Type.MYSQL) { // mysql的after里部分数据为未变更,oracle里after里为变更字段
                         isUpdate = column.getUpdated();
+                        //直接从解析结果判断，准确，需要比较before和after前后值
+                        Column beforeColumn = beforeColumnMap.get(column.getName());
+                        if(
+                            !isUpdate
+                            &&!StringUtils.equalsIgnoreCase(beforeColumn.getValue(),column.getValue())){
+                            isUpdate = true;
+                        }
+                        //测试中
                     }
 
                     notKeyColumns.put(column.getName(), copyEventColumn(column, isRowMode || isUpdate, tableHolder));// 如果是rowMode，所有字段都为updated
